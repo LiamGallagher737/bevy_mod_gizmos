@@ -1,0 +1,13 @@
+[package]
+name = "bevy_gizmos"
+description = "Visual gizmos to assist with development"
+license = "MIT"
+repository = "https://github.com/LiamGallagher737/bevy_gizmos"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# TODO: Only depend on required crates
+bevy = "0.7.0"
