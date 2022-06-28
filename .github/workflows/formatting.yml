@@ -1,0 +1,17 @@
+name: Formatting
+
+on:
+  push:
+    paths:
+      - 'src'
+  pull_request:
+    paths:
+      - 'src'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Formatting
+        run: cargo fmt --check
+    
