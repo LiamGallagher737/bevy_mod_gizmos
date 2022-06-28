@@ -9,5 +9,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# TODO: Only depend on required crates
+# TODO: Only depend on required parts of bevy
 bevy = "0.7.0"
+slotmap = "1.0.6"
+lazy_static = "1.4.0"
