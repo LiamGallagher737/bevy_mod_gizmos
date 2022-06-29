@@ -1,8 +1,6 @@
 use bevy::{
     pbr::{PbrBundle, StandardMaterial},
-    prelude::{
-        shape, App, Assets, Commands, Entity, Handle, Mesh, Plugin, ResMut, CoreStage,
-    },
+    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
 };
 use gizmo_types::*;
 use lazy_static::lazy_static;
@@ -17,7 +15,8 @@ new_key_type! {
 }
 
 lazy_static! {
-    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo + Send + Sync>)>> = RwLock::new(SlotMap::with_key());
+    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo + Send + Sync>)>> =
+        RwLock::new(SlotMap::with_key());
     static ref GIZMO_SPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_DESPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_TEMP_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
@@ -48,91 +47,77 @@ fn setup(mut meshes: ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMat
 }
 
 fn spawn_gizmos(mut commands: Commands) {
-    if let Ok(mut buffer) = GIZMO_SPAWN_BUFFER.write() {
+    if let (Ok(mut gizmos), Ok(mut buffer)) =(GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
         if buffer.is_empty() {
             return;
         }
 
-        if let Ok(mut gizmos) = GIZMOS.write() {
-            while let Some(key) = buffer.pop() {
-                if let Some(value) = gizmos.get_mut(key) {
-                    let entity = commands
-                        .spawn_bundle(PbrBundle {
-                            transform: value.1.get_transform(),
-                            mesh: value.1.get_mesh_handle(),
-                            ..Default::default()
-                        })
-                        .id();
-                    value.0 = Some(entity);
-                }
+        while let Some(key) = buffer.pop() {
+            if let Some(value) = gizmos.get_mut(key) {
+                let entity = commands
+                    .spawn_bundle(PbrBundle {
+                        transform: value.1.get_transform(),
+                        mesh: value.1.get_mesh_handle(),
+                        ..Default::default()
+                    })
+                    .id();
+                value.0 = Some(entity);
             }
         }
     }
 }
 
 fn despawn_gizmos(mut commands: Commands) {
-    if let Ok(mut buffer) = GIZMO_DESPAWN_BUFFER.write() {
+    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_DESPAWN_BUFFER.write()) {
         if buffer.is_empty() {
             return;
         }
 
-        if let Ok(mut gizmos) = GIZMOS.write() {
-            while let Some(key) = buffer.pop() {
-                if let Some((e, _)) = gizmos.get(key) {
-                    if let Some(entity) = e {
-                        commands.entity(*entity).despawn();
-                    }
-                    gizmos.remove(key);
+        while let Some(key) = buffer.pop() {
+            if let Some((e, _)) = gizmos.get(key) {
+                if let Some(entity) = e {
+                    commands.entity(*entity).despawn();
                 }
+                gizmos.remove(key);
             }
         }
     }
 }
 
 fn despawn_temp_gizmos(mut commands: Commands) {
-    if let Ok(mut buffer) = GIZMO_TEMP_BUFFER.write() {
+    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_TEMP_BUFFER.write()) {
         if buffer.is_empty() {
             return;
         }
 
-        if let Ok(mut gizmos) = GIZMOS.write() {
-            while let Some(key) = buffer.pop() {
-                if let Some((e, _)) = gizmos.get(key) {
-                    if let Some(entity) = e {
-                        commands.entity(*entity).despawn();
-                    }
-                    gizmos.remove(key);
+        while let Some(key) = buffer.pop() {
+            if let Some((e, _)) = gizmos.get(key) {
+                if let Some(entity) = e {
+                    commands.entity(*entity).despawn();
                 }
+                gizmos.remove(key);
             }
         }
     }
 }
 
 pub fn add_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey> {
-    if let Ok(mut gizmos) = GIZMOS.write() {
-        if let Ok(mut buffer) = GIZMO_SPAWN_BUFFER.write() {
-            let key = gizmos.insert((None, Box::new(gizmo)));
-            buffer.push(key);
-            Some(key)
-        } else {
-            None
-        }
+    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
+        let key = gizmos.insert((None, Box::new(gizmo)));
+        buffer.push(key);
+        Some(key)
     } else {
         None
     }
 }
 
 pub fn draw_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey> {
-    if let Ok(mut gizmos) = GIZMOS.write() {
-        if let Ok(mut buffer) = GIZMO_SPAWN_BUFFER.write() {
-            if let Ok(mut temp_gizmos) = GIZMO_TEMP_BUFFER.write() {
-                let key = gizmos.insert((None, Box::new(gizmo)));
-                buffer.push(key);
-                temp_gizmos.push(key);
-                Some(key)
-            } else {
-                None
-            }
+    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
+        if let Ok(mut temp_gizmos) = GIZMO_TEMP_BUFFER.write() {
+            let key = gizmos.insert((None, Box::new(gizmo)));
+            buffer.push(key);
+            temp_gizmos.push(key);
+            Some(key)
         } else {
             None
         }
