@@ -1,6 +1,7 @@
 use bevy::{
-    pbr::{PbrBundle, StandardMaterial},
-    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut}, utils::hashbrown::HashSet, ui::Interaction
+    pbr::PbrBundle,
+    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
+    utils::hashbrown::HashSet,
 };
 use gizmo_types::*;
 use lazy_static::lazy_static;
@@ -15,13 +16,17 @@ new_key_type! {
 }
 
 impl GizmoKey {
+    pub fn remove(self) {
+        remove_gizmo(self);
+    }
     pub fn is_hovered(&self) -> bool {
         is_hovered(self)
     }
 }
 
 lazy_static! {
-    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo + Send + Sync>)>> = RwLock::new(SlotMap::with_key());
+    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo>)>> =
+        RwLock::new(SlotMap::with_key());
     static ref GIZMO_SPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_DESPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_TEMP_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
@@ -53,7 +58,7 @@ fn setup(mut meshes: ResMut<Assets<Mesh>>) {
 }
 
 fn spawn_gizmos(mut commands: Commands) {
-    if let (Ok(mut gizmos), Ok(mut buffer)) =(GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
+    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
         if buffer.is_empty() {
             return;
         }
@@ -65,7 +70,8 @@ fn spawn_gizmos(mut commands: Commands) {
                         transform: value.1.get_transform(),
                         mesh: value.1.get_mesh_handle(),
                         ..Default::default()
-                    }).id();
+                    })
+                    .id();
                 value.0 = Some(entity);
             }
         }
@@ -106,7 +112,7 @@ fn despawn_temp_gizmos(mut commands: Commands) {
     }
 }
 
-pub fn add_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey> {
+pub fn add_gizmo<G: 'static + Gizmo>(gizmo: G) -> Option<GizmoKey> {
     if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
         let key = gizmos.insert((None, Box::new(gizmo)));
         buffer.push(key);
@@ -116,10 +122,8 @@ pub fn add_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey>
     }
 }
 
-pub fn draw_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey> {
-    if let (Ok(mut gizmos), Ok(mut buffer), Ok(mut temp_gizmos)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write(), GIZMO_TEMP_BUFFER.write()) {
-        let key = gizmos.insert((None, Box::new(gizmo)));
-        buffer.push(key);
+pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) -> Option<GizmoKey> {
+    if let (Ok(mut temp_gizmos), Some(key)) = (GIZMO_TEMP_BUFFER.write(), add_gizmo(gizmo)) {
         temp_gizmos.push(key);
         Some(key)
     } else {
