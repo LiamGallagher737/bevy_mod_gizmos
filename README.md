@@ -94,8 +94,3 @@ struct MeshGizmo {
 ```rs
 MeshGizmo::new(position, scale, mmesh_handle, color);
 ```
-
-
-
-# License
-This project is licensed under the [MIT license](https://github.com/LiamGallagher737/bevy_gizmos/blob/main/LICENSE). Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
