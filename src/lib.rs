@@ -1,6 +1,6 @@
 use bevy::{
     pbr::{PbrBundle, StandardMaterial},
-    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
+    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut}, utils::hashbrown::HashSet, ui::Interaction
 };
 use gizmo_types::*;
 use lazy_static::lazy_static;
@@ -14,13 +14,19 @@ new_key_type! {
     pub struct GizmoKey;
 }
 
+impl GizmoKey {
+    pub fn is_hovered(&self) -> bool {
+        is_hovered(self)
+    }
+}
+
 lazy_static! {
-    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo + Send + Sync>)>> =
-        RwLock::new(SlotMap::with_key());
+    static ref GIZMOS: RwLock<SlotMap<GizmoKey, (Option<Entity>, Box<dyn Gizmo + Send + Sync>)>> = RwLock::new(SlotMap::with_key());
     static ref GIZMO_SPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_DESPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_TEMP_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref MESH_HANDLES: RwLock<MeshHandles> = RwLock::new(MeshHandles::default());
+    static ref HOVERED_GIZMOS: RwLock<HashSet<GizmoKey>> = RwLock::new(HashSet::new());
 }
 
 #[derive(Default)]
@@ -39,10 +45,10 @@ impl Plugin for GizmosPlugin {
     }
 }
 
-fn setup(mut meshes: ResMut<Assets<Mesh>>, _materials: ResMut<Assets<StandardMaterial>>) {
+fn setup(mut meshes: ResMut<Assets<Mesh>>) {
     if let Ok(mut handles) = MESH_HANDLES.write() {
         handles.sphere = meshes.add(Mesh::from(shape::Icosphere::default()));
-        handles.cube = meshes.add(Mesh::from(shape::Box::default()));
+        handles.cube = meshes.add(Mesh::from(shape::Cube::default()));
     }
 }
 
@@ -59,8 +65,7 @@ fn spawn_gizmos(mut commands: Commands) {
                         transform: value.1.get_transform(),
                         mesh: value.1.get_mesh_handle(),
                         ..Default::default()
-                    })
-                    .id();
+                    }).id();
                 value.0 = Some(entity);
             }
         }
@@ -112,15 +117,11 @@ pub fn add_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey>
 }
 
 pub fn draw_gizmo<G: 'static + Gizmo + Send + Sync>(gizmo: G) -> Option<GizmoKey> {
-    if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
-        if let Ok(mut temp_gizmos) = GIZMO_TEMP_BUFFER.write() {
-            let key = gizmos.insert((None, Box::new(gizmo)));
-            buffer.push(key);
-            temp_gizmos.push(key);
-            Some(key)
-        } else {
-            None
-        }
+    if let (Ok(mut gizmos), Ok(mut buffer), Ok(mut temp_gizmos)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write(), GIZMO_TEMP_BUFFER.write()) {
+        let key = gizmos.insert((None, Box::new(gizmo)));
+        buffer.push(key);
+        temp_gizmos.push(key);
+        Some(key)
     } else {
         None
     }
@@ -135,5 +136,17 @@ pub fn remove_gizmo(key: GizmoKey) {
             buffer.push(key);
             gizmos.remove(key);
         }
+    }
+}
+
+pub fn is_hovered(key: &GizmoKey) -> bool {
+    if let Ok(hovered_gizmos) = HOVERED_GIZMOS.read() {
+        if hovered_gizmos.contains(&key) {
+            true
+        } else {
+            false
+        }
+    } else {
+        false
     }
 }
