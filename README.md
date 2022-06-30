@@ -57,41 +57,42 @@ bevy_gizmos::remove_gizmo(key);
 
 ### Sphere Gizmo
 ```rs
-SphereGizmo {
+struct SphereGizmo {
     position: Vec3,
     diameter: f32,
     color: Color,
 }
 ```
-
-### Cube Gizmo
 ```rs
-CubeGizmo {
-    position: Vec3,
-    size: f32,
-    color: Color,
-}
+SphereGizmo::new(position, diameter, color);
 ```
 
 ### Box Gizmo
 ```rs
-BoxGizmo {
+struct BoxGizmo {
     position: Vec3,
-    width: f32,
-    height: f32,
-    depth: f32,
+    scale: Vec3,
     color: Color,
 }
+```
+```rs
+BoxGizmo::new(position, scale, color);
+```
+```rs
+BoxGizmo::new_cube(position, size, color);
 ```
 
 ### Mesh Gizmo
 ```rs
-MeshGizmo {
+struct MeshGizmo {
     position: Vec3,
     scale: Vec3,
     mesh_handle: Handle<Mesh>,
     color: Color,
 }
+```
+```rs
+MeshGizmo::new(position, scale, mmesh_handle, color);
 ```
 
 
