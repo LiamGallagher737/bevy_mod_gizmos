@@ -24,7 +24,7 @@ Add the plugin to your app
 .add_plugin(bevy_gizmos::GizmosPlugin)
 ```
 
-Thats all you need to get gizmos setup!
+Thats all you need to setup gizmos!
 
 
 
