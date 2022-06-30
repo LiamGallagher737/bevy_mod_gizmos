@@ -1,7 +1,6 @@
 use bevy::{
     pbr::PbrBundle,
     prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
-    utils::hashbrown::HashSet,
 };
 use gizmo_types::*;
 use lazy_static::lazy_static;
@@ -19,9 +18,6 @@ impl GizmoKey {
     pub fn remove(self) {
         remove_gizmo(self);
     }
-    pub fn is_hovered(&self) -> bool {
-        is_hovered(self)
-    }
 }
 
 lazy_static! {
@@ -31,7 +27,6 @@ lazy_static! {
     static ref GIZMO_DESPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_TEMP_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref MESH_HANDLES: RwLock<MeshHandles> = RwLock::new(MeshHandles::default());
-    static ref HOVERED_GIZMOS: RwLock<HashSet<GizmoKey>> = RwLock::new(HashSet::new());
 }
 
 #[derive(Default)]
@@ -140,17 +135,5 @@ pub fn remove_gizmo(key: GizmoKey) {
             buffer.push(key);
             gizmos.remove(key);
         }
-    }
-}
-
-pub fn is_hovered(key: &GizmoKey) -> bool {
-    if let Ok(hovered_gizmos) = HOVERED_GIZMOS.read() {
-        if hovered_gizmos.contains(&key) {
-            true
-        } else {
-            false
-        }
-    } else {
-        false
     }
 }
