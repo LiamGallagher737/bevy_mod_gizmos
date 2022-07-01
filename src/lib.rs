@@ -1,6 +1,6 @@
 use bevy::{
-    pbr::PbrBundle,
-    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
+    pbr::{PbrBundle, StandardMaterial, NotShadowCaster},
+    prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut}, utils::hashbrown::HashMap,
 };
 use gizmo_types::*;
 use lazy_static::lazy_static;
@@ -27,6 +27,7 @@ lazy_static! {
     static ref GIZMO_DESPAWN_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref GIZMO_TEMP_BUFFER: RwLock<Vec<GizmoKey>> = RwLock::new(Vec::new());
     static ref MESH_HANDLES: RwLock<MeshHandles> = RwLock::new(MeshHandles::default());
+    static ref MATERIAL_HANDLES: RwLock<HashMap<u32, Handle<StandardMaterial>>> = RwLock::new(HashMap::new());
 }
 
 #[derive(Default)]
@@ -52,20 +53,35 @@ fn setup(mut meshes: ResMut<Assets<Mesh>>) {
     }
 }
 
-fn spawn_gizmos(mut commands: Commands) {
+fn spawn_gizmos(mut commands: Commands, mut materials: ResMut<Assets<StandardMaterial>>) {
     if let (Ok(mut gizmos), Ok(mut buffer)) = (GIZMOS.write(), GIZMO_SPAWN_BUFFER.write()) {
         if buffer.is_empty() {
             return;
         }
 
         while let Some(key) = buffer.pop() {
-            if let Some(value) = gizmos.get_mut(key) {
+            if let (Some(value), Ok(mut material_handles)) =( gizmos.get_mut(key), MATERIAL_HANDLES.write()) {
+                let material = {
+                    if let Some(handle) = material_handles.get(&value.1.get_color().as_linear_rgba_u32()) {
+                        handle.to_owned()
+                    } else {
+                        let m = materials.add(StandardMaterial {
+                            base_color: value.1.get_color(),
+                            unlit: true,
+                            ..Default::default()
+                        });
+                        material_handles.insert(value.1.get_color().as_linear_rgba_u32(), m.clone());
+                        m
+                    }
+                };
                 let entity = commands
                     .spawn_bundle(PbrBundle {
                         transform: value.1.get_transform(),
                         mesh: value.1.get_mesh_handle(),
+                        material,
                         ..Default::default()
                     })
+                    .insert(NotShadowCaster)
                     .id();
                 value.0 = Some(entity);
             }
@@ -135,5 +151,31 @@ pub fn remove_gizmo(key: GizmoKey) {
             buffer.push(key);
             gizmos.remove(key);
         }
+    }
+}
+
+pub fn add_gizmos<G: 'static + Gizmo>(gizmos: Vec<G>) -> Vec<GizmoKey> {
+    let mut gizmo_keys = vec![];
+    for gizmo in gizmos {
+        if let Some(key) = add_gizmo(gizmo) {
+            gizmo_keys.push(key)
+        }
+    }
+    gizmo_keys
+}
+
+pub fn draw_gizmos<G: 'static + Gizmo>(gizmos: Vec<G>) -> Vec<GizmoKey> {
+    let mut gizmo_keys = vec![];
+    for gizmo in gizmos {
+        if let Some(key) = draw_gizmo(gizmo) {
+            gizmo_keys.push(key)
+        }
+    }
+    gizmo_keys
+}
+
+pub fn remmove_gizmos(keys: Vec<GizmoKey>) {
+    for key in keys {
+        remove_gizmo(key);
     }
 }
