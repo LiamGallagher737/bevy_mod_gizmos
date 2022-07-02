@@ -24,7 +24,7 @@ pub(crate) fn setup(mut meshes: ResMut<Assets<Mesh>>) {
     }
 }
 
-/// A spherial [`Gizmo`] 
+/// A spherial [`Gizmo`]
 /// # Fields
 /// * `position` - The position in world space of the gizmo
 /// * `diameter` - The size of the gizmo
@@ -64,7 +64,7 @@ impl SphereGizmo {
     }
 }
 
-/// A box [`Gizmo`] 
+/// A box [`Gizmo`]
 /// # Fields
 /// * `position` - The position in world space of the gizmo
 /// * `scale` - The size of the gizmo
@@ -108,7 +108,7 @@ impl BoxGizmo {
     }
 }
 
-/// A spherial [`Gizmo`] 
+/// A spherial [`Gizmo`]
 /// # Fields
 /// * `position` - The position in world space of the gizmo
 /// * `scale` - The size of the gizmo
