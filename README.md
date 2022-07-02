@@ -46,6 +46,11 @@ The following will render a spherical gizmo
 draw_gizmo(SphereGizmo::new(position, diameter, color));
 ```
 
+You can use this for drawing a line
+```rs
+draw_line(points, color);
+```
+
 
 
 # Gizmo Types
