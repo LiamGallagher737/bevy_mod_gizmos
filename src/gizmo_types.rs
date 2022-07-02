@@ -24,6 +24,11 @@ pub(crate) fn setup(mut meshes: ResMut<Assets<Mesh>>) {
     }
 }
 
+/// A spherial [`Gizmo`] 
+/// # Fields
+/// * `position` - The position in world space of the gizmo
+/// * `diameter` - The size of the gizmo
+/// * `color` - The color of the gizmo
 pub struct SphereGizmo {
     pub position: Vec3,
     pub diameter: f32,
@@ -49,6 +54,7 @@ impl Gizmo for SphereGizmo {
 }
 
 impl SphereGizmo {
+    /// Returns a new [`SphereGizmo`] with it's position, diameter and color
     pub fn new(position: Vec3, diameter: f32, color: Color) -> Self {
         Self {
             position,
@@ -58,6 +64,11 @@ impl SphereGizmo {
     }
 }
 
+/// A box [`Gizmo`] 
+/// # Fields
+/// * `position` - The position in world space of the gizmo
+/// * `scale` - The size of the gizmo
+/// * `color` - The color of the gizmo
 pub struct BoxGizmo {
     pub position: Vec3,
     pub scale: Vec3,
@@ -83,6 +94,7 @@ impl Gizmo for BoxGizmo {
 }
 
 impl BoxGizmo {
+    /// Returns a new [`BoxGizmo`] with it's position, scale and color
     pub fn new(position: Vec3, scale: Vec3, color: Color) -> Self {
         Self {
             position,
@@ -90,11 +102,18 @@ impl BoxGizmo {
             color,
         }
     }
+    /// Returns a new [`BoxGizmo`] with it's position, scale based on size input and color
     pub fn new_cube(position: Vec3, size: f32, color: Color) -> Self {
         Self::new(position, Vec3::new(size, size, size), color)
     }
 }
 
+/// A spherial [`Gizmo`] 
+/// # Fields
+/// * `position` - The position in world space of the gizmo
+/// * `scale` - The size of the gizmo
+/// * `mesh_handle` - A [`Handle`] of the [`Mesh`] for the gizmo
+/// * `color` - The color of the gizmo
 pub struct MeshGizmo {
     pub position: Vec3,
     pub scale: Vec3,
@@ -121,6 +140,7 @@ impl Gizmo for MeshGizmo {
 }
 
 impl MeshGizmo {
+    /// Returns a new [`MeshGizmo`] with it's position, scale, mesh_handle and color
     pub fn new(position: Vec3, scale: Vec3, mesh_handle: Handle<Mesh>, color: Color) -> Self {
         Self {
             position,

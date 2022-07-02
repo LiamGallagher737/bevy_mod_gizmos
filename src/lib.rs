@@ -19,21 +19,31 @@ impl Plugin for GizmosPlugin {
 }
 
 pub trait Gizmo {
+    // /Construct a transform for the gizmo entity to use
     fn get_transform(&self) -> Transform;
+    /// Return the color for the gizmo to use
     fn get_color(&self) -> Color;
+    /// Return a handle of the mesh for the gizmo to use
     fn get_mesh_handle(&self) -> Handle<Mesh>;
 }
 
 lazy_static! {
+    /// Gizmos to spawn next time the system runs
     static ref GIZMO_BUFFER: RwLock<Vec<GizmoData>> = RwLock::new(vec![]);
 }
 
 struct GizmoData {
+    /// Transform of the gizmo
     transform: Transform,
+    /// Color of the gizmo
     color: Color,
+    /// Handle for the mesh the gizmo will use
     mesh_handle: Handle<Mesh>,
 }
 
+/// Draw a gizmo for a signle frame
+/// # Arguments
+/// * `gizmo` - The gizmo to spawn, this can be any struct that implements [`Gizmo`]
 pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
         gizmo_buffer.push(GizmoData {
@@ -44,6 +54,9 @@ pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
     }
 }
 
+/// Draw multiple gizmo sfor a signle frame
+/// # Arguments
+/// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of any struct that implements [`Gizmo`]
 pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>) {
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
         while let Some(gizmo) = gizmos.pop() {
@@ -56,6 +69,7 @@ pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>) {
     }
 }
 
+/// This s where the [`GizmoData`] objects in [`GIZMO_BUFFER`] is use to create entities
 fn gizmos_system(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
