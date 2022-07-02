@@ -11,6 +11,7 @@ pub mod gizmo_types;
 
 pub use basic::*;
 
+/// Add this to your bevy [`App`] to function
 pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
@@ -23,8 +24,9 @@ impl Plugin for GizmosPlugin {
     }
 }
 
+/// Implement this for a struct to use it as a gizmo
 pub trait Gizmo {
-    // /Construct a transform for the gizmo entity to use
+    /// Construct a transform for the gizmo entity to use
     fn get_transform(&self) -> Transform;
     /// Return the color for the gizmo to use
     fn get_color(&self) -> Color;
@@ -56,7 +58,7 @@ struct LineData {
     color: Color,
 }
 
-/// This s where the [`GizmoData`] objects in [`static@GIZMO_BUFFER`] is use to create entities
+/// This is where the [`GizmoData`] objects in [`static@GIZMO_BUFFER`] is use to create entities
 fn gizmos_system(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -82,7 +84,7 @@ fn gizmos_system(
     }
 }
 
-/// This s where the [`LineData`] objects in [`static@LINE_BUFFER`] is use to create entities
+/// This is where the [`LineData`] objects in [`static@LINE_BUFFER`] is use to create entities
 fn lines_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,

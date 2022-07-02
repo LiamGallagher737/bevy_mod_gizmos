@@ -1,3 +1,5 @@
+//! This contains the basic gizmo types such as [`SphereGizmo`], [`BoxGizmo`] and [`MeshGizmo`]
+
 use bevy::{
     math::Vec3,
     prelude::{shape, Assets, Color, Handle, Mesh, ResMut, Transform},
@@ -108,7 +110,7 @@ impl BoxGizmo {
     }
 }
 
-/// A spherial [`Gizmo`]
+/// A custim mesh [`Gizmo`]
 /// # Fields
 /// * `position` - The position in world space of the gizmo
 /// * `scale` - The size of the gizmo

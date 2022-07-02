@@ -1,4 +1,4 @@
-//! This contains just the basic things for gizmos
+//! This contains the basic gizmo tools like [`draw_gizmo`], [`draw_gizmos`] and [`draw_line`]
 
 use bevy::math::Vec3;
 
@@ -19,9 +19,10 @@ pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
     }
 }
 
-/// Draw multiple gizmo for a signle frame
+/// Draw multiple gizmo for a single frame
 /// # Arguments
 /// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of any struct that implements [`Gizmo`]
+/// * `line` - Wether or not you want to draw a line between the gizmos
 pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
     if gizmos.is_empty() {
         return;
@@ -43,7 +44,14 @@ pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
     }
 }
 
+/// Draws a lines from a list of points
+/// # Arguments
+/// * `points` - A [`Vec`] of [`Vec3`] hold the positions for the line
+/// * `color` - The color you would lke the line to be
 pub fn draw_line(points: Vec<Vec3>, color: Color) {
+    if points.len() < 2 {
+        return;
+    }
     if let Ok(mut line_buffer) = LINE_BUFFER.write() {
         line_buffer.push(LineData {
             points,
