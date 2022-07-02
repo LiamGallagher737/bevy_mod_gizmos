@@ -41,18 +41,9 @@ cargo run --example CommingSoon™
 
 # Basic Use
 
-To draw a sphere gizmo for a single frame use
+The following will render a spherical gizmo
 ```rs
-bevy_gizmos::draw_gizmo(SphereGizmo::new(position, diameter, color));
-```
-
-To add a persistent sphere gizmo use
-```rs
-bevy_gizmos::add_gizmo(SphereGizmo::new(position, diameter, color));
-```
-Both return a `GizmoKey` which can be used to remove the gizmo
-```rs
-bevy_gizmos::remove_gizmo(key);
+draw_gizmo(SphereGizmo::new(position, diameter, color));
 ```
 
 
@@ -97,4 +88,25 @@ struct MeshGizmo {
 ```
 ```rs
 MeshGizmo::new(position, scale, mmesh_handle, color);
+```
+
+
+
+# Custom Gizmos
+
+You can create your own custom gizmos by impleenting `bevy_gizmos::Gizmo` on any struct
+```rs
+impl Gizmo for YourCustomGizmo {
+    fn get_transform(&self) -> Transform {
+        // Transform
+    }
+
+    fn get_color(&self) -> Color {
+        // Color
+    }
+
+    fn get_mesh_handle(&self) -> Handle<Mesh> {
+        // Mesh Handle
+    }
+}
 ```
