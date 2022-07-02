@@ -29,7 +29,10 @@ pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
     }
     if line {
         draw_line(
-            gizmos.iter().map(|g| g.get_transform().translation).collect(),
+            gizmos
+                .iter()
+                .map(|g| g.get_transform().translation)
+                .collect(),
             gizmos[0].get_color(),
         );
     }
@@ -53,9 +56,6 @@ pub fn draw_line(points: Vec<Vec3>, color: Color) {
         return;
     }
     if let Ok(mut line_buffer) = LINE_BUFFER.write() {
-        line_buffer.push(LineData {
-            points,
-            color,
-        });
+        line_buffer.push(LineData { points, color });
     }
 }

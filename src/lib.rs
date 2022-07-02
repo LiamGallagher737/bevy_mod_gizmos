@@ -1,7 +1,11 @@
 use bevy::{
+    math::Vec3,
     pbr::{NotShadowCaster, NotShadowReceiver, PbrBundle, StandardMaterial},
-    prelude::{App, Assets, Color, Commands, Entity, Handle, Mesh, Plugin, ResMut, Transform, CoreStage},
-    utils::hashbrown::HashMap, math::Vec3, render::mesh::{PrimitiveTopology, Indices},
+    prelude::{
+        App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut, Transform,
+    },
+    render::mesh::{Indices, PrimitiveTopology},
+    utils::hashbrown::HashMap,
 };
 use lazy_static::lazy_static;
 use std::sync::RwLock;
@@ -67,7 +71,8 @@ fn gizmos_system(
 ) {
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
         while let Some(gizmo) = gizmo_buffer.pop() {
-            let material_handle = get_material_handle(gizmo.color, &mut material_handles, &mut materials);
+            let material_handle =
+                get_material_handle(gizmo.color, &mut material_handles, &mut materials);
             gizmo_entities.0.push(
                 commands
                     .spawn_bundle(PbrBundle {
@@ -92,9 +97,10 @@ fn lines_system(
     mut gizmo_entities: ResMut<GizmoEntities>,
     mut material_handles: ResMut<MaterialHandles>,
 ) {
-    if let (Ok(mut line_buffer), Ok(mut temp_mesh_handles)) = (LINE_BUFFER.write(), TEMP_MESH_HANDLES.write()) {
+    if let (Ok(mut line_buffer), Ok(mut temp_mesh_handles)) =
+        (LINE_BUFFER.write(), TEMP_MESH_HANDLES.write())
+    {
         while let Some(line) = line_buffer.pop() {
-
             let mut mesh = Mesh::new(PrimitiveTopology::LineStrip);
 
             let mut vertices = vec![];
@@ -103,7 +109,10 @@ fn lines_system(
             }
             mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);
 
-            mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, vec![[0.0, 1.0, 0.0]; line.points.len()]);
+            mesh.insert_attribute(
+                Mesh::ATTRIBUTE_NORMAL,
+                vec![[0.0, 1.0, 0.0]; line.points.len()],
+            );
             mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, vec![[0.0, 0.0]; line.points.len()]);
 
             let mut indices = vec![];
@@ -115,7 +124,8 @@ fn lines_system(
             let mesh_handle = meshes.add(mesh);
             temp_mesh_handles.push(mesh_handle.clone());
 
-            let material_handle = get_material_handle(line.color, &mut material_handles, &mut materials);
+            let material_handle =
+                get_material_handle(line.color, &mut material_handles, &mut materials);
             gizmo_entities.0.push(
                 commands
                     .spawn_bundle(PbrBundle {
@@ -123,7 +133,7 @@ fn lines_system(
                         material: material_handle,
                         ..Default::default()
                     })
-                    .id()
+                    .id(),
             );
         }
     }
@@ -147,9 +157,13 @@ fn cleanup_system(
     }
 }
 
-/// If we have a [`StandardMaterial`] already with the same [`Color`] then we return 
+/// If we have a [`StandardMaterial`] already with the same [`Color`] then we return
 /// the [`Handle`] to that,  else we create a new material and return its [`Handle`]
-fn get_material_handle(color: Color, material_handles: &mut ResMut<MaterialHandles>, materials: &mut ResMut<Assets<StandardMaterial>>) -> Handle<StandardMaterial> {
+fn get_material_handle(
+    color: Color,
+    material_handles: &mut ResMut<MaterialHandles>,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+) -> Handle<StandardMaterial> {
     let color_id = color.as_linear_rgba_u32();
     let material = if material_handles.0.contains_key(&color_id) {
         material_handles.0[&color_id].clone()
