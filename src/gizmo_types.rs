@@ -1,14 +1,27 @@
 use bevy::{
     math::Vec3,
-    prelude::{Color, Handle, Mesh, Transform},
+    prelude::{shape, Assets, Color, Handle, Mesh, ResMut, Transform},
 };
+use lazy_static::lazy_static;
+use std::sync::RwLock;
 
-use crate::MESH_HANDLES;
+use crate::Gizmo;
 
-pub trait Gizmo: Send + Sync {
-    fn get_transform(&self) -> Transform;
-    fn get_color(&self) -> Color;
-    fn get_mesh_handle(&self) -> Handle<Mesh>;
+lazy_static! {
+    static ref PRIMITIVE_MESH_HANDLES: RwLock<MeshHandles> = RwLock::new(MeshHandles::default());
+}
+
+#[derive(Default)]
+struct MeshHandles {
+    sphere: Handle<Mesh>,
+    cube: Handle<Mesh>,
+}
+
+pub(crate) fn setup(mut meshes: ResMut<Assets<Mesh>>) {
+    if let Ok(mut handles) = PRIMITIVE_MESH_HANDLES.write() {
+        handles.sphere = meshes.add(Mesh::from(shape::Icosphere::default()));
+        handles.cube = meshes.add(Mesh::from(shape::Cube::default()));
+    }
 }
 
 pub struct SphereGizmo {
@@ -31,7 +44,7 @@ impl Gizmo for SphereGizmo {
     }
 
     fn get_mesh_handle(&self) -> Handle<Mesh> {
-        MESH_HANDLES.read().unwrap().sphere.clone()
+        PRIMITIVE_MESH_HANDLES.read().unwrap().sphere.clone()
     }
 }
 
@@ -65,7 +78,7 @@ impl Gizmo for BoxGizmo {
     }
 
     fn get_mesh_handle(&self) -> Handle<Mesh> {
-        MESH_HANDLES.read().unwrap().cube.clone()
+        PRIMITIVE_MESH_HANDLES.read().unwrap().cube.clone()
     }
 }
 

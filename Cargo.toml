@@ -10,5 +10,4 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.7", default-features = false, features = [ "render" ]}
-slotmap = "1.0.6"
 lazy_static = "1.4.0"
