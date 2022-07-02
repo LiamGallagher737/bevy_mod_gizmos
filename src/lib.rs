@@ -1,5 +1,5 @@
 use bevy::{
-    pbr::{PbrBundle, StandardMaterial, NotShadowCaster},
+    pbr::{PbrBundle, StandardMaterial, NotShadowCaster, NotShadowReceiver},
     prelude::{shape, App, Assets, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut}, utils::hashbrown::HashMap,
 };
 use gizmo_types::*;
@@ -60,7 +60,7 @@ fn spawn_gizmos(mut commands: Commands, mut materials: ResMut<Assets<StandardMat
         }
 
         while let Some(key) = buffer.pop() {
-            if let (Some(value), Ok(mut material_handles)) =( gizmos.get_mut(key), MATERIAL_HANDLES.write()) {
+            if let (Some(value), Ok(mut material_handles)) = (gizmos.get_mut(key), MATERIAL_HANDLES.write()) {
                 let material = {
                     if let Some(handle) = material_handles.get(&value.1.get_color().as_linear_rgba_u32()) {
                         handle.to_owned()
@@ -82,6 +82,7 @@ fn spawn_gizmos(mut commands: Commands, mut materials: ResMut<Assets<StandardMat
                         ..Default::default()
                     })
                     .insert(NotShadowCaster)
+                    .insert(NotShadowReceiver)
                     .id();
                 value.0 = Some(entity);
             }
