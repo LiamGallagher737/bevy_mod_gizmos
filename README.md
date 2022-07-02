@@ -24,7 +24,11 @@ Add the plugin to your app
 .add_plugin(bevy_gizmos::GizmosPlugin)
 ```
 
-Thats all you need to setup gizmos!
+To increase performance I recommend the following in your `Cargo.toml`
+```toml
+[profile.dev.package."*"]
+opt-level = 3
+```
 
 
 
