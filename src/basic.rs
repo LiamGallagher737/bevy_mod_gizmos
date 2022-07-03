@@ -1,4 +1,4 @@
-//! This contains the basic gizmo tools like [`draw_gizmo`], [`draw_gizmos`] and [`draw_line`]
+//! This contains the basic gizmo tools for drawing gizmos and lines
 
 use bevy::math::Vec3;
 
@@ -6,7 +6,7 @@ use crate::*;
 
 pub use crate::gizmo_types::{BoxGizmo, MeshGizmo, SphereGizmo};
 
-/// Draw a gizmo for a signle frame
+/// Draws a gizmo for a signle frame
 /// # Arguments
 /// * `gizmo` - The gizmo to spawn, this can be any struct that implements [`Gizmo`]
 pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
@@ -19,10 +19,10 @@ pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
     }
 }
 
-/// Draw multiple gizmo for a single frame
+/// Draws multiple gizmos for a single frame
 /// # Arguments
 /// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of any struct that implements [`Gizmo`]
-/// * `line` - Wether or not you want to draw a line between the gizmos
+/// * `line` - Whether or not you want to draw a line between the gizmos
 pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
     if gizmos.is_empty() {
         return;
@@ -49,7 +49,7 @@ pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
 
 /// Draws a lines from a list of points
 /// # Arguments
-/// * `points` - A [`Vec`] of [`Vec3`] hold the positions for the line
+/// * `points` - A [`Vec`] of [`Vec3`] holding the lne points
 /// * `color` - The color you would lke the line to be
 pub fn draw_line(points: Vec<Vec3>, color: Color) {
     if points.len() < 2 {

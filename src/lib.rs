@@ -15,7 +15,7 @@ pub mod gizmo_types;
 
 pub use basic::*;
 
-/// Add this to your bevy [`App`] to function
+/// Add this to your bevy [`App`] for gizmos to function
 pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
@@ -34,7 +34,7 @@ pub trait Gizmo {
     fn get_transform(&self) -> Transform;
     /// Return the color for the gizmo to use
     fn get_color(&self) -> Color;
-    /// Return a handle of the mesh for the gizmo to use
+    /// Return a handle to the mesh for the gizmo to use
     fn get_mesh_handle(&self) -> Handle<Mesh>;
 }
 
@@ -165,7 +165,7 @@ fn get_material_handle(
     materials: &mut ResMut<Assets<StandardMaterial>>,
 ) -> Handle<StandardMaterial> {
     let color_id = color.as_linear_rgba_u32();
-    let material = if material_handles.0.contains_key(&color_id) {
+    if material_handles.0.contains_key(&color_id) {
         material_handles.0[&color_id].clone()
     } else {
         let handle = materials.add(StandardMaterial {
@@ -175,8 +175,7 @@ fn get_material_handle(
         });
         material_handles.0.insert(color_id, handle.clone());
         handle
-    };
-    material
+    }
 }
 
 #[derive(Default)]
