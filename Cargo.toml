@@ -10,4 +10,5 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.7", default-features = false, features = [ "render" ]}
+bevy_mod_picking = "0.7"
 lazy_static = "1.4.0"

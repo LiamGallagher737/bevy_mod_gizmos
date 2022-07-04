@@ -1,17 +1,18 @@
 use bevy::{
     math::Vec3,
     pbr::{NotShadowCaster, NotShadowReceiver, PbrBundle, StandardMaterial},
-    prelude::{
-        App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut, Transform,
-    },
+    prelude::{App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
     render::mesh::{Indices, PrimitiveTopology},
     utils::hashbrown::HashMap,
 };
+use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle, DebugCursorPickingPlugin};
+use interactions::interaction_system;
 use lazy_static::lazy_static;
 use std::sync::RwLock;
 
 pub mod basic;
-pub mod gizmo_types;
+pub mod gizmo;
+pub mod interactions;
 
 pub use basic::*;
 
@@ -19,42 +20,26 @@ pub use basic::*;
 pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
+        app.add_plugins(DefaultPickingPlugins);
+        // app.add_plugin(DebugCursorPickingPlugin);
         app.init_resource::<GizmoEntities>();
         app.init_resource::<MaterialHandles>();
-        app.add_startup_system(gizmo_types::setup);
+        app.add_startup_system(gizmo::setup);
         app.add_system_to_stage(CoreStage::First, cleanup_system);
         app.add_system(gizmos_system);
         app.add_system(lines_system);
+        app.add_system(interaction_system);
     }
-}
-
-/// Implement this for a struct to use it as a gizmo
-pub trait Gizmo {
-    /// Construct a transform for the gizmo entity to use
-    fn get_transform(&self) -> Transform;
-    /// Return the color for the gizmo to use
-    fn get_color(&self) -> Color;
-    /// Return a handle to the mesh for the gizmo to use
-    fn get_mesh_handle(&self) -> Handle<Mesh>;
 }
 
 lazy_static! {
     /// Gizmos to spawn next time the system runs
-    static ref GIZMO_BUFFER: RwLock<Vec<GizmoData>> = RwLock::new(vec![]);
+    static ref GIZMO_BUFFER: RwLock<Vec<Gizmo>> = RwLock::new(vec![]);
     /// Lines to spawn next time the system runs
     static ref LINE_BUFFER: RwLock<Vec<LineData>> = RwLock::new(vec![]);
 
     // Mesh handles to remove next frame
     static ref TEMP_MESH_HANDLES: RwLock<Vec<Handle<Mesh>>> = RwLock::new(vec![]);
-}
-
-struct GizmoData {
-    /// Transform of the gizmo
-    transform: Transform,
-    /// Color of the gizmo
-    color: Color,
-    /// Handle for the mesh the gizmo will use
-    mesh_handle: Handle<Mesh>,
 }
 
 struct LineData {
@@ -73,6 +58,7 @@ fn gizmos_system(
         while let Some(gizmo) = gizmo_buffer.pop() {
             let material_handle =
                 get_material_handle(gizmo.color, &mut material_handles, &mut materials);
+
             gizmo_entities.0.push(
                 commands
                     .spawn_bundle(PbrBundle {
@@ -83,6 +69,8 @@ fn gizmos_system(
                     })
                     .insert(NotShadowCaster)
                     .insert(NotShadowReceiver)
+                    .insert(gizmo.interactions)
+                    .insert_bundle(PickableBundle::default())
                     .id(),
             );
         }
@@ -158,7 +146,7 @@ fn cleanup_system(
 }
 
 /// If we have a [`StandardMaterial`] already with the same [`Color`] then we return
-/// the [`Handle`] to that,  else we create a new material and return its [`Handle`]
+/// a [`Handle`] to that, else we create a new material and return its [`Handle`]
 fn get_material_handle(
     color: Color,
     material_handles: &mut ResMut<MaterialHandles>,

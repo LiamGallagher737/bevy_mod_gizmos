@@ -4,18 +4,14 @@ use bevy::math::Vec3;
 
 use crate::*;
 
-pub use crate::gizmo_types::{BoxGizmo, MeshGizmo, SphereGizmo};
+pub use crate::gizmo::Gizmo;
 
 /// Draws a gizmo for a signle frame
 /// # Arguments
 /// * `gizmo` - The gizmo to spawn, this can be any struct that implements [`Gizmo`]
-pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
+pub fn draw_gizmo(gizmo: Gizmo) {
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
-        gizmo_buffer.push(GizmoData {
-            transform: gizmo.get_transform(),
-            color: gizmo.get_color(),
-            mesh_handle: gizmo.get_mesh_handle(),
-        });
+        gizmo_buffer.push(gizmo);
     }
 }
 
@@ -23,26 +19,19 @@ pub fn draw_gizmo<G: 'static + Gizmo>(gizmo: G) {
 /// # Arguments
 /// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of any struct that implements [`Gizmo`]
 /// * `line` - Whether or not you want to draw a line between the gizmos
-pub fn draw_gizmos<G: 'static + Gizmo>(mut gizmos: Vec<G>, line: bool) {
+pub fn draw_gizmos(mut gizmos: Vec<Gizmo>, line: bool) {
     if gizmos.is_empty() {
         return;
     }
     if line {
         draw_line(
-            gizmos
-                .iter()
-                .map(|g| g.get_transform().translation)
-                .collect(),
-            gizmos[0].get_color(),
+            gizmos.iter().map(|g| g.transform.translation).collect(),
+            gizmos[0].color,
         );
     }
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
         while let Some(gizmo) = gizmos.pop() {
-            gizmo_buffer.push(GizmoData {
-                transform: gizmo.get_transform(),
-                color: gizmo.get_color(),
-                mesh_handle: gizmo.get_mesh_handle(),
-            });
+            gizmo_buffer.push(gizmo);
         }
     }
 }
