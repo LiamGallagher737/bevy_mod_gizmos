@@ -115,3 +115,9 @@ impl Gizmo for YourCustomGizmo {
     }
 }
 ```
+
+
+
+# License
+
+This project is licensed under the [MIT license](https://github.com/LiamGallagher737/bevy_gizmos/blob/main/LICENSE). Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in bevy_gizmos by you, shall be licensed as MIT, without any additional terms or conditions.
