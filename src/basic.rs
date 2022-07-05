@@ -38,8 +38,8 @@ pub fn draw_gizmos(mut gizmos: Vec<Gizmo>, line: bool) {
 
 /// Draws a lines from a list of points
 /// # Arguments
-/// * `points` - A [`Vec`] of [`Vec3`] holding the lne points
-/// * `color` - The color you would lke the line to be
+/// * `points` - A [`Vec`] of [`Vec3`] holding the line points
+/// * `color` - The color of the line
 pub fn draw_line(points: Vec<Vec3>, color: Color) {
     if points.len() < 2 {
         return;

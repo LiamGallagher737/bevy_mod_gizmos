@@ -1,11 +1,11 @@
 use bevy::{
     math::Vec3,
     pbr::{NotShadowCaster, NotShadowReceiver, PbrBundle, StandardMaterial},
-    prelude::{App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut},
+    prelude::{App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut, ParallelSystemDescriptorCoercion, IntoExclusiveSystem, ExclusiveSystemDescriptorCoercion},
     render::mesh::{Indices, PrimitiveTopology},
     utils::hashbrown::HashMap,
 };
-use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle, DebugCursorPickingPlugin};
+use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle, PickingSystem};
 use interactions::interaction_system;
 use lazy_static::lazy_static;
 use std::sync::RwLock;
@@ -21,14 +21,15 @@ pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPickingPlugins);
-        // app.add_plugin(DebugCursorPickingPlugin);
+        app.add_plugin(bevy_mod_picking::DebugCursorPickingPlugin);
         app.init_resource::<GizmoEntities>();
         app.init_resource::<MaterialHandles>();
         app.add_startup_system(gizmo::setup);
-        app.add_system_to_stage(CoreStage::First, cleanup_system);
-        app.add_system(gizmos_system);
-        app.add_system(lines_system);
-        app.add_system(interaction_system);
+        app.add_system_to_stage(CoreStage::PostUpdate, cleanup_system);
+        app.add_system_to_stage(CoreStage::PostUpdate, gizmos_system.after(cleanup_system));
+        app.add_system_to_stage(CoreStage::PostUpdate, lines_system.after(cleanup_system));
+        // app.add_system(interaction_system.exclusive_system());
+        app.add_system_to_stage(CoreStage::First, interaction_system.exclusive_system().after(PickingSystem::Events));
     }
 }
 

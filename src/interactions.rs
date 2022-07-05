@@ -1,6 +1,6 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use bevy::{prelude::{Component, EventReader, Commands, World}, math::Vec3};
+use bevy::{prelude::{Component, World}, ecs::event::Events};
 use bevy_mod_picking::{PickingCameraBundle, PickingEvent};
 
 use crate::Gizmo;
@@ -11,11 +11,11 @@ pub struct GizmoInteractionRaycastSet;
 
 static INTERACTION_ID_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
-#[derive(Default, Component)]
+#[derive(Component)]
 pub struct GizmoInteractions {
     pub id: usize,
-    pub on_click: Option<Box<dyn Fn(usize) + Send + Sync>>,
-    pub on_hover: Option<Box<dyn Fn(usize) + Send + Sync>>,
+    pub on_click: Option<fn(&mut World)>,
+    pub on_hover: Option<fn(&mut World)>,
 }
 
 impl GizmoInteractions {
@@ -31,40 +31,39 @@ impl GizmoInteractions {
 }
 
 impl Gizmo {
-    pub fn on_click<F: Fn(usize) + Send + Sync + 'static>(&mut self, on_click: F) -> usize {
-        self.interactions.on_click = Some(Box::new(on_click));
-        self.interactions.id
+    pub fn on_click(mut self, on_click: fn(&mut World) -> ()) -> Self {
+        self.interactions.on_click = Some(on_click);
+        self
     }
 
-    pub fn on_hover<F: Fn(usize) + Send + Sync + 'static>(&mut self, on_click: F) -> usize {
-        self.interactions.on_hover = Some(Box::new(on_click));
-        self.interactions.id
+    pub fn on_hover(mut self, on_click: fn(&mut World) -> ()) -> Self {
+        self.interactions.on_hover = Some(on_click);
+        self
     }
 }
 
-pub(crate) fn interaction_system(world: &World, mut events: EventReader<PickingEvent>) {
+pub(crate) fn interaction_system(world: &mut World) {
     INTERACTION_ID_COUNTER.store(0, Ordering::Relaxed);
-    for event in events.iter() {
-        match event {
-            PickingEvent::Clicked(entity) => {
-                if let Some(interactions) = world.entity(*entity).get::<GizmoInteractions>() {
-                    if let Some(on_click) = &interactions.on_click {
-                        // on_click(interactions.id);
+    let mut functions = vec![];
+    if let Some(events) = world.get_resource::<Events<PickingEvent>>() {
+        for event in events.get_reader().iter(&events) {
+            match event {
+                PickingEvent::Clicked(entity) => {
+                    if let Some(interactions) = world.entity(*entity).get::<GizmoInteractions>() {
+                        if let Some(on_click) = &interactions.on_click {
+                            functions.push(on_click.clone());
+                        }
                     }
-                }
-            },
-            PickingEvent::Hover(event) => {
-                let entity = match event {
-                    bevy_mod_picking::HoverEvent::JustEntered(e) => e,
-                    bevy_mod_picking::HoverEvent::JustLeft(e) => e,
-                };
-                if let Some(interactions) = world.entity(*entity).get::<GizmoInteractions>() {
-                    if let Some(on_hover) = &interactions.on_hover {
-                        // on_hover(interactions.id);
-                    }
-                }
-            },
-            _ => {},
+                },
+                PickingEvent::Hover(_hover) => {
+                    // println!("{:#?}", hover);
+                },
+                _ => {}
+            }
         }
+    }
+
+    for func in functions {
+        func(world);
     }
 }

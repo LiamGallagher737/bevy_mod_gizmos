@@ -24,6 +24,11 @@ Add the plugin to your app
 .add_plugin(bevy_gizmos::GizmosPlugin)
 ```
 
+For interactive gizmos add the following when creating your camera
+```rs
+.insert_bundle(GizmoInteractionCamera::default())
+```
+
 To increase performance I recommend the following in your `Cargo.toml`
 ```toml
 [profile.dev.package."*"]
@@ -32,88 +37,53 @@ opt-level = 3
 
 
 
+<!--
 # Demo
 ```console
 cargo run --example CommingSoon™ 
 ```
+-->
 
 
 
-# Basic Use
+# Usage
 
-The following will render a spherical gizmo
+Render a single gizmo
 ```rs
-draw_gizmo(SphereGizmo::new(position, diameter, color));
+draw_gizmo(gizmo);
 ```
 
-You can use this for drawing a line
+Render multiple gizmos and a connecting line
+```rs
+draw_gizmos(vec![gizmo, gizmo, gizmo], true);
+```
+
+Render a line
 ```rs
 draw_line(points, color);
 ```
 
 
 
-# Gizmo Types
+# Gizmos
 
-### Sphere Gizmo
 ```rs
-struct SphereGizmo {
-    position: Vec3,
-    diameter: f32,
-    color: Color,
-}
+Gizmo::sphere(position, size, color)
 ```
 ```rs
-SphereGizmo::new(position, diameter, color);
-```
-
-### Box Gizmo
-```rs
-struct BoxGizmo {
-    position: Vec3,
-    scale: Vec3,
-    color: Color,
-}
+Gizmo::cube(position, size, color)
 ```
 ```rs
-BoxGizmo::new(position, scale, color);
+Gizmo::box(position, scale, color)
 ```
 ```rs
-BoxGizmo::new_cube(position, size, color);
-```
-
-### Mesh Gizmo
-```rs
-struct MeshGizmo {
-    position: Vec3,
-    scale: Vec3,
-    mesh_handle: Handle<Mesh>,
-    color: Color,
-}
+Gizmo::capsule(position, width, height, color)
 ```
 ```rs
-MeshGizmo::new(position, scale, mmesh_handle, color);
+Gizmo::torus(position, size, color)
 ```
-
-
-
-# Custom Gizmos
-
-You can create your own custom gizmos by impleenting `bevy_gizmos::Gizmo` on any struct
 ```rs
-impl Gizmo for YourCustomGizmo {
-    fn get_transform(&self) -> Transform {
-        // Transform
-    }
-
-    fn get_color(&self) -> Color {
-        // Color
-    }
-
-    fn get_mesh_handle(&self) -> Handle<Mesh> {
-        // Mesh Handle
-    }
-}
+Gizmo::new(position, scale, color, mesh_handle)
 ```
 
 

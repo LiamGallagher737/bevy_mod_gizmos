@@ -2,7 +2,7 @@
 
 use bevy::{
     math::{Quat, Vec3},
-    prelude::{shape, Assets, Color, Handle, Mesh, ResMut, Transform, Component},
+    prelude::{shape, Assets, Color, Handle, Mesh, ResMut, Transform},
 };
 use lazy_static::lazy_static;
 use std::{
@@ -20,12 +20,16 @@ lazy_static! {
 struct MeshHandles {
     sphere: Handle<Mesh>,
     cube: Handle<Mesh>,
+    capsule: Handle<Mesh>,
+    torus: Handle<Mesh>,
 }
 
 pub(crate) fn setup(mut meshes: ResMut<Assets<Mesh>>) {
     if let Ok(mut handles) = PRIMITIVE_MESH_HANDLES.write() {
         handles.sphere = meshes.add(Mesh::from(shape::Icosphere::default()));
         handles.cube = meshes.add(Mesh::from(shape::Cube::default()));
+        handles.capsule = meshes.add(Mesh::from(shape::Capsule::default()));
+        handles.torus = meshes.add(Mesh::from(shape::Torus::default()));
     }
 }
 
@@ -89,6 +93,32 @@ impl Gizmo {
         }
     }
 
+    pub fn capsule(translation: Vec3, width: f32, height: f32, color: Color) -> Self {
+        Self {
+            transform: Transform {
+                translation,
+                scale: Vec3::new(width, height, width),
+                ..Default::default()
+            },
+            color,
+            mesh_handle: PRIMITIVE_MESH_HANDLES.read().unwrap().capsule.clone(),
+            ..Default::default()
+        }
+    }
+
+    pub fn torus(translation: Vec3, size: f32, color: Color) -> Self {
+        Self {
+            transform: Transform {
+                translation,
+                scale: Vec3::new(size, size, size),
+                ..Default::default()
+            },
+            color,
+            mesh_handle: PRIMITIVE_MESH_HANDLES.read().unwrap().torus.clone(),
+            ..Default::default()
+        }
+    }
+
     pub fn with_position(mut self, translation: Vec3) -> Self {
         self.transform.translation = translation;
         self
@@ -116,7 +146,7 @@ impl Default for Gizmo {
             transform: Transform::default(),
             color: Color::default(),
             mesh_handle: PRIMITIVE_MESH_HANDLES.read().unwrap().sphere.clone(),
-            interactions: GizmoInteractions::default(),
+            interactions: GizmoInteractions::new(),
         }
     }
 }
@@ -125,8 +155,8 @@ impl Display for Gizmo {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(
             f,
-            "Position: {0} \n Scale: {1}, \n Rotation: {2} \n Color: {3:#?}",
-            self.transform.translation, self.transform.scale, self.transform.rotation, self.color
+            "Position: {0} \nScale: {1}, \nRotation: {2} \nColor: {3:?}",
+            self.transform.translation, self.transform.scale, self.transform.rotation, self.color.as_linear_rgba_f32()
         )
     }
 }
