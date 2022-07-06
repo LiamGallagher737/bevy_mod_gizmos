@@ -19,6 +19,11 @@ Add the following to your `Cargo.toml`
 bevy_gizmos = { git = "https://github.com/LiamGallagher737/bevy_gizmos" }
 ```
 
+Add this to any file you want to use gizmos in
+```rs
+use bevy_gizmos::*:
+```
+
 Add the plugin to your app
 ```rs
 .add_plugin(bevy_gizmos::GizmosPlugin)
