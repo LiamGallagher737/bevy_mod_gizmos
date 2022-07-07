@@ -156,7 +156,10 @@ impl Display for Gizmo {
         write!(
             f,
             "Position: {0} \nScale: {1}, \nRotation: {2} \nColor: {3:?}",
-            self.transform.translation, self.transform.scale, self.transform.rotation, self.color.as_linear_rgba_f32()
+            self.transform.translation,
+            self.transform.scale,
+            self.transform.rotation,
+            self.color.as_linear_rgba_f32()
         )
     }
 }

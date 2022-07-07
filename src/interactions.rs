@@ -1,6 +1,9 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use bevy::{prelude::{Component, World}, ecs::event::Events};
+use bevy::{
+    ecs::event::Events,
+    prelude::{Component, World},
+};
 use bevy_mod_picking::{PickingCameraBundle, PickingEvent};
 
 use crate::Gizmo;
@@ -48,16 +51,20 @@ pub(crate) fn interaction_system(world: &mut World) {
     if let Some(events) = world.get_resource::<Events<PickingEvent>>() {
         for event in events.get_reader().iter(&events) {
             match event {
-                PickingEvent::Clicked(entity) => {
-                    if let Some(interactions) = world.entity(*entity).get::<GizmoInteractions>() {
-                        if let Some(on_click) = &interactions.on_click {
-                            functions.push(on_click.clone());
+                PickingEvent::Clicked(e) => {
+                    if let Some(entity) = world.get_entity(*e) {
+                        if let Some(interactions) = entity.get::<GizmoInteractions>() {
+                            if let Some(on_click) = &interactions.on_click {
+                                functions.push(on_click.clone());
+                            }
                         }
+                    } else {
+                        println!("Entity not found");
                     }
-                },
+                }
                 PickingEvent::Hover(_hover) => {
                     // println!("{:#?}", hover);
-                },
+                }
                 _ => {}
             }
         }
