@@ -3,6 +3,7 @@ name = "bevy_mod_gizmos"
 description = "Visual gizmos to aid with development and debugging in Bevy"
 license = "MIT"
 repository = "https://github.com/LiamGallagher737/bevy_gizmos"
+readme = "README.md"
 version = "0.1.0"
 edition = "2021"
 
