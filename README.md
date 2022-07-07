@@ -16,17 +16,17 @@ Add image/gif here
 
 Add the following to your `Cargo.toml`
 ```toml
-bevy_gizmos = { git = "https://github.com/LiamGallagher737/bevy_gizmos" }
+bevy_mod_gizmos = { git = "https://github.com/LiamGallagher737/bevy_mod_gizmos" }
 ```
 
 Add this to any file you want to use gizmos in
 ```rs
-use bevy_gizmos::*:
+use bevy_mod_gizmos::*:
 ```
 
 Add the plugin to your app
 ```rs
-.add_plugin(bevy_gizmos::GizmosPlugin)
+.add_plugin(bevy_mod_gizmos::GizmosPlugin)
 ```
 
 For interactive gizmos add the following when creating your camera
@@ -95,4 +95,4 @@ Gizmo::new(position, scale, color, mesh_handle)
 
 # License
 
-This project is licensed under the [MIT license](https://github.com/LiamGallagher737/bevy_gizmos/blob/main/LICENSE). Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in bevy_gizmos by you, shall be licensed as MIT, without any additional terms or conditions.
+This project is licensed under the [MIT license](https://github.com/LiamGallagher737/bevy_gizmos/blob/main/LICENSE). Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in bevy_mod_gizmos by you, shall be licensed as MIT, without any additional terms or conditions.
