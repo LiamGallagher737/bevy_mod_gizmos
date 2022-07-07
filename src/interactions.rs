@@ -22,6 +22,7 @@ lazy_static! {
 #[derive(Clone, Default)]
 pub struct GizmoInteractions {
     pub(crate) lifetime: u8,
+    // May add more interactions in the future like hover
     pub on_click: Option<fn(&mut World)>,
 }
 
@@ -35,6 +36,23 @@ impl GizmoInteractions {
 }
 
 impl Gizmo {
+    /// Change the gizmos on_click interaction
+    /// # Example
+    /// ```
+    /// use bevy::prelude::*;
+    /// use bevy_mod_gizmos::*;
+    ///
+    /// let gizmo = Gizmo::default().on_click(|world| {
+    ///
+    ///     // What to do when clicked, you have full access to the ECS world though
+    ///     // be aware that while this runs no other systems can run in parallel
+    ///
+    ///     let mut query = world.query::<&mut Transform>();
+    ///     for mut transform in query.iter_mut(world) {
+    ///         transform.translation.x += 0.1;
+    ///     }
+    /// });
+    /// ```
     pub fn on_click(mut self, on_click: fn(&mut World) -> ()) -> Self {
         self.interactions.on_click = Some(on_click);
         self
