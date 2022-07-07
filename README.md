@@ -16,7 +16,7 @@ Add image/gif here
 
 Add the following to your `Cargo.toml`
 ```toml
-bevy_mod_gizmos = { git = "https://github.com/LiamGallagher737/bevy_mod_gizmos" }
+bevy_mod_gizmos = "0.1"
 ```
 
 Add this to any file you want to use gizmos in
