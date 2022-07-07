@@ -168,7 +168,7 @@ fn cleanup_system(
                 v.lifetime += 1;
                 continue;
             }
-            remove.push(k.clone());
+            remove.push(*k);
         }
         for k in remove {
             interactions.remove(&k);

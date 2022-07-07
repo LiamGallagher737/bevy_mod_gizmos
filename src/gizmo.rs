@@ -146,7 +146,7 @@ impl Default for Gizmo {
             transform: Transform::default(),
             color: Color::default(),
             mesh_handle: PRIMITIVE_MESH_HANDLES.read().unwrap().sphere.clone(),
-            interactions: GizmoInteractions::new(),
+            interactions: GizmoInteractions::default(),
         }
     }
 }
