@@ -9,7 +9,7 @@ use bevy::{
     utils::hashbrown::HashMap,
 };
 use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle, PickingSystem};
-use interactions::interaction_system;
+use interactions::{interaction_system, INTERACTIONS};
 use lazy_static::lazy_static;
 use std::sync::RwLock;
 
@@ -36,17 +36,10 @@ impl Plugin for GizmosPlugin {
         );
         app.add_system_to_stage(
             CoreStage::PreUpdate,
-            cleanup_system
-                .before(PickingSystem::Selection)
+            cleanup_system.before(PickingSystem::Selection),
         );
-        app.add_system_to_stage(
-            CoreStage::Update,
-            gizmos_system
-        );
-        app.add_system_to_stage(
-            CoreStage::Update,
-            lines_system
-        );
+        app.add_system_to_stage(CoreStage::Update, gizmos_system);
+        app.add_system_to_stage(CoreStage::Update, lines_system);
         // app.add_system(interaction_system.exclusive_system());
     }
 }
@@ -78,20 +71,25 @@ fn gizmos_system(
             let material_handle =
                 get_material_handle(gizmo.color, &mut material_handles, &mut materials);
 
-            gizmo_entities.0.push(
-                commands
-                    .spawn_bundle(PbrBundle {
-                        transform: gizmo.transform,
-                        mesh: gizmo.mesh_handle,
-                        material: material_handle,
-                        ..Default::default()
-                    })
-                    .insert(NotShadowCaster)
-                    .insert(NotShadowReceiver)
-                    .insert(gizmo.interactions)
-                    .insert_bundle(PickableBundle::default())
-                    .id(),
-            );
+            let entity = commands
+                .spawn_bundle(PbrBundle {
+                    transform: gizmo.transform,
+                    mesh: gizmo.mesh_handle,
+                    material: material_handle,
+                    ..Default::default()
+                })
+                .insert(NotShadowCaster)
+                .insert(NotShadowReceiver)
+                .insert_bundle(PickableBundle::default())
+                .id();
+
+            gizmo_entities.0.push(entity);
+            if gizmo.interactions.has_none() {
+                continue;
+            }
+            if let Ok(mut i) = interactions::INTERACTIONS.write() {
+                i.insert(entity, gizmo.interactions);
+            }
         }
     }
 }
@@ -160,6 +158,20 @@ fn cleanup_system(
     if let Ok(mut temp_mesh_handles) = TEMP_MESH_HANDLES.write() {
         while let Some(mesh_handle) = temp_mesh_handles.pop() {
             meshes.remove(mesh_handle);
+        }
+    }
+    // interactions::INTERACTIONS.write().unwrap().clear();
+    if let Ok(mut interactions) = INTERACTIONS.write() {
+        let mut remove = vec![];
+        for (k, mut v) in interactions.iter_mut() {
+            if v.lifetime < 1 {
+                v.lifetime += 1;
+                continue;
+            }
+            remove.push(k.clone());
+        }
+        for k in remove {
+            interactions.remove(&k);
         }
     }
 }
