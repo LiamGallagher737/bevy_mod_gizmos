@@ -79,7 +79,7 @@ Gizmo::sphere(position, size, color)
 Gizmo::cube(position, size, color)
 ```
 ```rs
-Gizmo::box(position, scale, color)
+Gizmo::cubiod(position, scale, color)
 ```
 ```rs
 Gizmo::capsule(position, width, height, color)
