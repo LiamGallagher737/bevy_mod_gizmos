@@ -16,7 +16,7 @@ Add image/gif here
 
 Add the following to your `Cargo.toml`
 ```toml
-bevy_mod_gizmos = "0.1"
+bevy_mod_gizmos = "0.1.0"
 ```
 
 Add this to any file you want to use gizmos in
@@ -26,7 +26,7 @@ use bevy_mod_gizmos::*:
 
 Add the plugin to your app
 ```rs
-.add_plugin(bevy_mod_gizmos::GizmosPlugin)
+.add_plugin(GizmosPlugin)
 ```
 
 For interactive gizmos add the following when creating your camera
@@ -90,6 +90,8 @@ Gizmo::torus(position, size, color)
 ```rs
 Gizmo::new(position, scale, color, mesh_handle)
 ```
+
+[More Info](https://docs.rs/bevy_mod_gizmos/0.1.0/bevy_mod_gizmos/gizmo/struct.Gizmo.html)
 
 
 
