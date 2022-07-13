@@ -4,9 +4,9 @@
 
 Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine.org/)
 
-<!--
-Add image/gif here
--->
+[![dependency status](https://deps.rs/repo/github/LiamGallagher737/bevy_mod_gizmos/status.svg)](https://deps.rs/repo/github/LiamGallagher737/bevy_mod_gizmos)
+[![crates.io](https://img.shields.io/crates/v/bevy_mod_gizmos)](https://crates.io/crates/bevy_mod_gizmos)
+[![docs.rs](https://docs.rs/bevy_mod_gizmos/badge.svg)](https://docs.rs/bevy_mod_gizmos)
 
 </div>
 
