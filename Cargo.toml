@@ -1,7 +1,7 @@
 [package]
 name = "bevy_mod_gizmos"
 description = "Visual gizmos to aid with development and debugging in Bevy"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/LiamGallagher737/bevy_gizmos"
 readme = "README.md"
 version = "0.1.1"
