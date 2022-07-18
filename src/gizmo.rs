@@ -42,6 +42,13 @@ pub struct Gizmo {
 
 impl Gizmo {
     /// Create a new gizmo with a custom mesh
+    /// # Example
+    /// ```
+    /// use bevy::prelude::*;
+    /// use bevy_mod_gizmos::*;
+    ///
+    /// let gizmo = Gizmo::new(Vec3::new(8.0, 2.0, 5.0), Vec3::new(3.0, 6.0, 9.0), Color::GREEN, Handle::<Mesh>::default());
+    /// ```
     pub fn new(translation: Vec3, scale: Vec3, color: Color, mesh_handle: Handle<Mesh>) -> Self {
         Self {
             transform: Transform {
@@ -211,6 +218,19 @@ impl Gizmo {
         self.color = color;
         self
     }
+
+    /// Change the gizmos mesh
+    /// # Example
+    /// ```
+    /// use bevy::prelude::*;
+    /// use bevy_mod_gizmos::*;
+    ///
+    /// let gizmo = Gizmo::default().with_mesh(Handle::<Mesh>::default());
+    /// ```
+    pub fn with_mesh(mut self, mesh_handle: Handle<Mesh>) -> Self {
+        self.mesh_handle = mesh_handle;
+        self
+    }
 }
 
 impl Default for Gizmo {
@@ -228,7 +248,7 @@ impl Default for Gizmo {
 }
 
 impl Display for Gizmo {
-    /// Your average formatting
+    /// Basic formatting
     /// # Example
     /// ``Gizmo::default()`` results in
     /// ```text

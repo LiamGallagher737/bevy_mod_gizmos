@@ -8,7 +8,7 @@ pub use crate::gizmo::Gizmo;
 
 /// Draws a gizmo for a single frame
 /// # Arguments
-/// * `gizmo` - The gizmo to spawn, this can be any struct that implements [`Gizmo`]
+/// * `gizmo` - The gizmo to spawn, [How to create a gizmo](Gizmo)
 /// # Example
 /// ```
 /// use bevy_mod_gizmos::*;
@@ -22,7 +22,7 @@ pub fn draw_gizmo(gizmo: Gizmo) {
 
 /// Draws multiple gizmos for a single frame
 /// # Arguments
-/// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of any struct that implements [`Gizmo`]
+/// * `gizmos` - The gizmos to spawn, this is a [`Vec`] of gizmos, [How to create a gizmo](Gizmo)
 /// * `line` - Whether or not you want to draw a line between the gizmos
 /// # Example
 /// ```
