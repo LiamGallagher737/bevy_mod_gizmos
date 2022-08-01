@@ -10,6 +10,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.7", default-features = false, features = [ "render" ]}
+bevy = { version = "0.8", default-features = false, features = [ "render" ]}
 bevy_mod_picking = "0.7"
 lazy_static = "1.4.0"
