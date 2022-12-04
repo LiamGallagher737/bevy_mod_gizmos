@@ -4,9 +4,10 @@
 
 Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine.org/)
 
-[![dependency status](https://deps.rs/repo/github/LiamGallagher737/bevy_mod_gizmos/status.svg)](https://deps.rs/repo/github/LiamGallagher737/bevy_mod_gizmos)
-[![crates.io](https://img.shields.io/crates/v/bevy_mod_gizmos)](https://crates.io/crates/bevy_mod_gizmos)
-[![docs.rs](https://docs.rs/bevy_mod_gizmos/badge.svg)](https://docs.rs/bevy_mod_gizmos)
+[<img alt="build status" src="https://img.shields.io/github/workflow/status/LiamGallagher737/bevy_mod_gizmos/CI/main?style=for-the-badge" height="24">](https://github.com/LiamGallagher737/bevy_mod_gizmos/actions)
+[<img alt="github" src="https://img.shields.io/badge/github-bevy__mod__gizmos-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="24">](https://github.com/LiamGallagher737/bevy_mod_gizmos)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/bevy_mod_gizmos.svg?style=for-the-badge&color=fc8d62&logo=rust" height="24">](https://crates.io/crates/bevy_mod_gizmos)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-bevy__mod__gizmos-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="24">](https://docs.rs/bevy_mod_gizmos)
 
 </div>
 
