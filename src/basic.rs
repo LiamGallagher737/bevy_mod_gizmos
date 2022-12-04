@@ -52,6 +52,7 @@ pub fn draw_gizmos(mut gizmos: Vec<Gizmo>, line: bool) {
 /// * `color` - The color of the line
 /// # Example
 /// ```
+/// # use bevy::prelude::*;
 /// use bevy_mod_gizmos::*;
 /// draw_line(vec![Vec3::new(8.0, 2.0, 5.0), Vec3::new(9.0, 3.0, 6.0), Vec3::new(10.0, 4.0, 7.0)], Color::GREEN);
 /// ```

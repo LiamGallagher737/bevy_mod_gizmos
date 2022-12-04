@@ -4,12 +4,15 @@ description = "Visual gizmos to aid with development and debugging in Bevy"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/LiamGallagher737/bevy_gizmos"
 readme = "README.md"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = [
+    "examples/*",
+]
 
 [dependencies]
-bevy = { version = "0.8", default-features = false, features = [ "render" ]}
-bevy_mod_picking = "0.7"
-lazy_static = "1.4.0"
+bevy = "0.9"
+bevy_mod_picking = "0.10"
+lazy_static = "1.4"

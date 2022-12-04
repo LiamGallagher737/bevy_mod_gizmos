@@ -167,15 +167,15 @@ impl Gizmo {
         }
     }
 
-    /// Change the gizmos positon
+    /// Change the gizmos translation
     /// # Example
     /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
-    /// let gizmo = Gizmo::default().with_position(Vec3::new(8.0, 2.0, 5.0));
+    /// # use bevy::prelude::*;
+    /// # use bevy_mod_gizmos::*;
+    /// let gizmo = Gizmo::default().with_translation(Vec3::new(8.0, 2.0, 5.0));
+    /// assert_eq!(gizmo.transform.translation, Vec3::new(8.0, 2.0, 5.0));
     /// ```
-    pub fn with_position(mut self, translation: Vec3) -> Self {
+    pub fn with_translation(mut self, translation: Vec3) -> Self {
         self.transform.translation = translation;
         self
     }
@@ -183,10 +183,10 @@ impl Gizmo {
     /// Change the gizmos scale
     /// # Example
     /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
+    /// # use bevy::prelude::*;
+    /// # use bevy_mod_gizmos::*;
     /// let gizmo = Gizmo::default().with_scale(Vec3::new(3.0, 6.0, 9.0));
+    /// assert_eq!(gizmo.transform.scale, Vec3::new(3.0, 6.0, 9.0));
     /// ```
     pub fn with_scale(mut self, scale: Vec3) -> Self {
         self.transform.scale = scale;
@@ -196,10 +196,10 @@ impl Gizmo {
     /// Change the gizmos rotation
     /// # Example
     /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
+    /// # use bevy::prelude::*;
+    /// # use bevy_mod_gizmos::*;
     /// let gizmo = Gizmo::default().with_rotation(Quat::from_xyzw(0.0, 0.7, 0.7, 0.0));
+    /// assert_eq!(gizmo.transform.rotation, Quat::from_xyzw(0.0, 0.7, 0.7, 0.0));
     /// ```
     pub fn with_rotation(mut self, rotation: Quat) -> Self {
         self.transform.rotation = rotation;
@@ -209,10 +209,10 @@ impl Gizmo {
     /// Change the gizmos color
     /// # Example
     /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
+    /// # use bevy::prelude::*;
+    /// # use bevy_mod_gizmos::*;
     /// let gizmo = Gizmo::default().with_color(Color::GREEN);
+    /// assert_eq!(gizmo.color, Color::GREEN);
     /// ```
     pub fn with_color(mut self, color: Color) -> Self {
         self.color = color;
@@ -222,10 +222,10 @@ impl Gizmo {
     /// Change the gizmos mesh
     /// # Example
     /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
+    /// # use bevy::prelude::*;
+    /// # use bevy_mod_gizmos::*;
     /// let gizmo = Gizmo::default().with_mesh(Handle::<Mesh>::default());
+    /// assert_eq!(gizmo.mesh_handle, Handle::<Mesh>::default());
     /// ```
     pub fn with_mesh(mut self, mesh_handle: Handle<Mesh>) -> Self {
         self.mesh_handle = mesh_handle;

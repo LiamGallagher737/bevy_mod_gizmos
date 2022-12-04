@@ -1,14 +1,51 @@
+//! Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine.org/)
+//!
+//! # Examples
+//!
+//! Draw a single gizmo
+//! ```
+//! # use bevy::prelude::*;
+//! # use bevy_mod_gizmos::*;
+//! draw_gizmo(Gizmo::sphere(Vec3::new(12.0, 0.0, 8.0), 1.0, Color::BLUE));
+//! ```
+//!
+//! Draw multiple gizmos
+//! ```
+//! # use bevy::prelude::*;
+//! # use bevy_mod_gizmos::*;
+//! draw_gizmos(
+//!     vec![
+//!         Gizmo::sphere(Vec3::new(12.0, 0.0, 8.0), 1.0, Color::BLUE),
+//!         Gizmo::cube(Vec3::new(12.0, 0.0, 8.0), 1.0, Color::BLUE),
+//!     ],
+//!     true, // True if you want to draw a line between the gizmos
+//! );
+//! ```
+//!
+//! Draw a line
+//! ```
+//! # use bevy::prelude::*;
+//! # use bevy_mod_gizmos::*;
+//! draw_line(
+//!     vec![
+//!         Vec3::new(0.0, 0.0, 0.0),
+//!         Vec3::new(1.0, 0.0, 0.0),
+//!         Vec3::new(1.0, 0.0, 1.0),
+//!     ],
+//!     Color::BLUE,
+//! );
+//! ```
+
 use bevy::{
     math::Vec3,
     pbr::{NotShadowCaster, NotShadowReceiver, PbrBundle, StandardMaterial},
     prelude::{
-        App, Assets, Color, Commands, CoreStage, Entity, ExclusiveSystemDescriptorCoercion, Handle,
-        IntoExclusiveSystem, Mesh, ParallelSystemDescriptorCoercion, Plugin, ResMut,
+        App, Assets, Color, Commands, CoreStage, Entity, Handle, Mesh, Plugin, ResMut, Resource,
     },
     render::mesh::{Indices, PrimitiveTopology},
     utils::hashbrown::HashMap,
 };
-use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle, PickingSystem};
+use bevy_mod_picking::{DefaultPickingPlugins, PickableBundle};
 use interactions::{interaction_system, INTERACTIONS};
 use lazy_static::lazy_static;
 use std::sync::RwLock;
@@ -18,29 +55,20 @@ pub mod gizmo;
 pub mod interactions;
 
 pub use basic::*;
+pub use interactions::GizmoInteractionCamera;
 
 /// Add this to your bevy [`App`] for gizmos to function
 pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPickingPlugins);
-        app.add_plugin(bevy_mod_picking::DebugCursorPickingPlugin);
         app.init_resource::<GizmoEntities>();
         app.init_resource::<MaterialHandles>();
         app.add_startup_system(gizmo::setup);
-        app.add_system_to_stage(
-            CoreStage::First,
-            interaction_system
-                .exclusive_system()
-                .after(PickingSystem::Events),
-        );
-        app.add_system_to_stage(
-            CoreStage::PreUpdate,
-            cleanup_system.before(PickingSystem::Selection),
-        );
+        app.add_system_to_stage(CoreStage::First, interaction_system);
+        app.add_system_to_stage(CoreStage::PreUpdate, cleanup_system);
         app.add_system_to_stage(CoreStage::Update, gizmos_system);
         app.add_system_to_stage(CoreStage::Update, lines_system);
-        // app.add_system(interaction_system.exclusive_system());
     }
 }
 
@@ -66,21 +94,27 @@ fn gizmos_system(
     mut gizmo_entities: ResMut<GizmoEntities>,
     mut material_handles: ResMut<MaterialHandles>,
 ) {
+    // Stops flickering for some off reason
+    // TODO: Needs a proper solution
+    std::thread::sleep(std::time::Duration::from_micros(1));
+
     if let Ok(mut gizmo_buffer) = GIZMO_BUFFER.write() {
         while let Some(gizmo) = gizmo_buffer.pop() {
             let material_handle =
                 get_material_handle(gizmo.color, &mut material_handles, &mut materials);
 
             let entity = commands
-                .spawn_bundle(PbrBundle {
-                    transform: gizmo.transform,
-                    mesh: gizmo.mesh_handle,
-                    material: material_handle,
-                    ..Default::default()
-                })
-                .insert(NotShadowCaster)
-                .insert(NotShadowReceiver)
-                .insert_bundle(PickableBundle::default())
+                .spawn((
+                    PbrBundle {
+                        transform: gizmo.transform,
+                        mesh: gizmo.mesh_handle,
+                        material: material_handle,
+                        ..Default::default()
+                    },
+                    NotShadowCaster,
+                    NotShadowReceiver,
+                    PickableBundle::default(),
+                ))
                 .id();
 
             gizmo_entities.0.push(entity);
@@ -133,7 +167,7 @@ fn lines_system(
                 get_material_handle(line.color, &mut material_handles, &mut materials);
             gizmo_entities.0.push(
                 commands
-                    .spawn_bundle(PbrBundle {
+                    .spawn(PbrBundle {
                         mesh: mesh_handle,
                         material: material_handle,
                         ..Default::default()
@@ -197,7 +231,7 @@ fn get_material_handle(
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct GizmoEntities(Vec<Entity>);
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct MaterialHandles(HashMap<u32, Handle<StandardMaterial>>);

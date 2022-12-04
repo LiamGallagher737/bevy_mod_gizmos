@@ -16,7 +16,7 @@ Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine
 
 Add the following to your `Cargo.toml`
 ```toml
-bevy_mod_gizmos = "0.1"
+bevy_mod_gizmos = "0.2.0"
 ```
 
 Add this to any file you want to use gizmos in
@@ -29,9 +29,9 @@ Add the plugin to your app
 .add_plugin(GizmosPlugin)
 ```
 
-For interactive gizmos add the following when creating your camera
+For interactive gizmos add the following bundle when spawning your camera
 ```rs
-.insert_bundle(GizmoInteractionCamera::default())
+GizmoInteractionCamera::default()
 ```
 
 To increase performance I recommend the following in your `Cargo.toml`
@@ -42,12 +42,13 @@ opt-level = 3
 
 
 
-<!--
 # Demo
-```console
-cargo run --example CommingSoon™ 
+
+This exampels showcases all built-in gizmmo types and interactions. Click on a gizmo and it will print to the console its name.
+
 ```
--->
+cargo run --example demo 
+```
 
 
 
@@ -91,7 +92,16 @@ Gizmo::torus(position, size, color)
 Gizmo::new(position, scale, color, mesh_handle)
 ```
 
-[More Info](https://docs.rs/bevy_mod_gizmos/0.1.0/bevy_mod_gizmos/gizmo/struct.Gizmo.html)
+[More Info](https://docs.rs/bevy_mod_gizmos/latest/bevy_mod_gizmos/gizmo/struct.Gizmo.html)
+
+
+
+# Bevy Tracking
+
+|Bevy|bevy_mod_gizmos|
+|---|---|
+|0.9|0.2.0|
+|0.7|0.1.1|
 
 
 
