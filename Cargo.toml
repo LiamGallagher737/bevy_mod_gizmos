@@ -6,6 +6,7 @@ repository = "https://github.com/LiamGallagher737/bevy_gizmos"
 readme = "README.md"
 version = "0.2.0"
 edition = "2021"
+exclude = [".github/"]
 
 [workspace]
 members = [
