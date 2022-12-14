@@ -4,7 +4,7 @@
 
 Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine.org/)
 
-[<img alt="bevy tracking" src="https://img.shields.io/badge/Bevy%20tracking-main-lightblue?style=for-the-badge" height="24">](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)
+[<img alt="bevy tracking" src="https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue?style=for-the-badge" height="24">](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)
 [<img alt="build status" src="https://img.shields.io/github/workflow/status/LiamGallagher737/bevy_mod_gizmos/CI/main?style=for-the-badge" height="24">](https://github.com/LiamGallagher737/bevy_mod_gizmos/actions)
 [<img alt="github" src="https://img.shields.io/badge/github-bevy__mod__gizmos-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="24">](https://github.com/LiamGallagher737/bevy_mod_gizmos)
 [<img alt="crates.io" src="https://img.shields.io/crates/v/bevy_mod_gizmos.svg?style=for-the-badge&color=fc8d62&logo=rust" height="24">](https://crates.io/crates/bevy_mod_gizmos)
