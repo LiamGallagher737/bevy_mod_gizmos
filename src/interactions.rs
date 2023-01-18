@@ -1,80 +1,78 @@
-use std::sync::RwLock;
-
-use bevy::{
-    ecs::event::Events,
-    prelude::{Entity, World},
-    utils::hashbrown::HashMap,
-};
-use bevy_mod_picking::{PickingCameraBundle, PickingEvent};
-use lazy_static::lazy_static;
-
 use crate::Gizmo;
+use bevy::prelude::*;
 
-pub type GizmoInteractionCamera = PickingCameraBundle;
-
-pub struct GizmoInteractionRaycastSet;
-
-lazy_static! {
-    pub(crate) static ref INTERACTIONS: RwLock<HashMap<Entity, GizmoInteractions>> =
-        RwLock::new(HashMap::new());
-}
-
-#[derive(Clone, Default)]
-pub struct GizmoInteractions {
-    pub(crate) lifetime: u8,
-    // May add more interactions in the future like hover
-    pub on_click: Option<fn(&mut World)>,
-}
-
-impl GizmoInteractions {
-    pub fn has_some(&self) -> bool {
-        self.on_click.is_some()
-    }
-    pub fn has_none(&self) -> bool {
-        !self.has_some()
-    }
+#[derive(Debug, Default)]
+pub(crate) struct GizmoInteractions {
+    pub(crate) on_hover: Option<fn()>,
+    pub(crate) on_click: Option<fn()>,
 }
 
 impl Gizmo {
-    /// Change the gizmos on_click interaction
-    /// # Example
-    /// ```
-    /// use bevy::prelude::*;
-    /// use bevy_mod_gizmos::*;
-    ///
-    /// let gizmo = Gizmo::default().on_click(|world| {
-    ///
-    ///     // What to do when clicked, you have full access to the ECS world though
-    ///     // be aware that while this runs no other systems can run in parallel
-    ///
-    ///     let mut query = world.query::<&mut Transform>();
-    ///     for mut transform in query.iter_mut(world) {
-    ///         transform.translation.x += 0.1;
-    ///     }
-    /// });
-    /// ```
-    pub fn on_click(mut self, on_click: fn(&mut World) -> ()) -> Self {
-        self.interactions.on_click = Some(on_click);
+    pub fn on_hover(mut self, func: fn()) -> Self {
+        self.interactions.on_hover = Some(func);
+        self
+    }
+
+    pub fn on_click(mut self, func: fn()) -> Self {
+        self.interactions.on_click = Some(func);
         self
     }
 }
 
-pub(crate) fn interaction_system(world: &mut World) {
-    if let Ok(mut interactions) = INTERACTIONS.write() {
-        let mut functions: Vec<fn(&mut World)> = vec![];
-        if let Some(events) = world.get_resource::<Events<PickingEvent>>() {
-            for event in events.get_reader().iter(events) {
-                if let PickingEvent::Clicked(entity) = event {
-                    if interactions.contains_key(entity) {
-                        if let Some(f) = interactions.remove(entity).unwrap().on_click {
-                            functions.push(f);
-                        }
+/// Add this to your main camera for interactable gizmos to function
+#[derive(Component, Default)]
+pub struct GizmoInteractionCamera;
+
+#[derive(Component)]
+pub struct OnHover(pub(crate) fn());
+
+#[derive(Component)]
+pub struct OnClick(pub(crate) fn());
+
+pub(crate) fn interactions_handler(
+    query: Query<(Option<&OnHover>, Option<&OnClick>, &Transform)>,
+    camera: Query<(&Camera, &GlobalTransform), With<GizmoInteractionCamera>>,
+    mouse_btns: Res<Input<MouseButton>>,
+    windows: Res<Windows>,
+) {
+    // Get the mouse position
+    let mouse_pos = if let Some(Some(pos)) = windows.get_primary().map(|w| w.cursor_position()) {
+        pos
+    } else {
+        // Most likely the cursor isn't within the window
+        return;
+    };
+
+    // Get the gizmo interaction camera
+    let (camera, cam_transform) = if let Ok(cam) = camera.get_single() {
+        cam
+    } else {
+        return;
+    };
+
+    for (on_hover, on_click, transform) in query.iter() {
+        // Cast a ray from the camera at the mouse position
+        if let Some(ray) = camera.viewport_to_world(cam_transform, mouse_pos) {
+            let origin = ray.origin - transform.translation;
+            let closest_point = ray.direction.dot(origin);
+            let distance = (origin - closest_point * ray.direction).length();
+
+            // If the distance value if less than the gizmo
+            // size then the gizmo is behind the cursor
+            if distance < transform.scale.x {
+                // On Hover
+                if let Some(on_hover) = on_hover {
+                    on_hover.0();
+                }
+
+                // On Click
+                if let Some(on_click) = on_click {
+                    if !mouse_btns.just_pressed(MouseButton::Left) {
+                        continue;
                     }
+                    on_click.0();
                 }
             }
-        }
-        for func in functions {
-            func(world);
         }
     }
 }
