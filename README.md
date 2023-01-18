@@ -14,6 +14,21 @@ Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine
 
 
 
+# [Demo](examples/demo.rs)
+
+This examples showcases all built-in gizmo types and interactions. Click on a gizmo and it will print to the console its name.
+
+```
+cargo run --example demo 
+```
+
+<!-- ![Demo Example Screenshot](examples/images/DemoScreenshot.png) -->
+<div align="center">
+    <img src="examples/images/DemoScreenshot.png" alt="Demo Example Screenshot" width="600" />
+</div>
+
+
+
 # Setup
 
 Add the following to your `Cargo.toml`
@@ -23,7 +38,7 @@ bevy_mod_gizmos = "0.3.0"
 
 Add this to any file you want to use gizmos in
 ```rs
-use bevy_mod_gizmos::*:
+use bevy_mod_gizmos::*;
 ```
 
 Add the plugin to your app
@@ -40,16 +55,6 @@ To increase performance I recommend the following in your `Cargo.toml`
 ```toml
 [profile.dev.package."*"]
 opt-level = 3
-```
-
-
-
-# Demo
-
-This examples showcases all built-in gizmo types and interactions. Click on a gizmo and it will print to the console its name.
-
-```
-cargo run --example demo 
 ```
 
 
