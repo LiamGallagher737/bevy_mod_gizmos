@@ -16,7 +16,7 @@ Visual gizmos to aid with development and debugging in [Bevy](https://bevyengine
 
 # [Demo](examples/demo.rs)
 
-This examples showcases all built-in gizmo types and interactions. Click on a gizmo and it will print to the console its name.
+This examples showcases all built-in gizmo types and interactions. Try hovering and clicking the center gizmo!
 
 ```
 cargo run --example demo 
@@ -37,17 +37,17 @@ bevy_mod_gizmos = "0.3.1"
 ```
 
 Add this to any file you want to use gizmos in
-```rs
+```rust
 use bevy_mod_gizmos::*;
 ```
 
 Add the plugin to your app
-```rs
+```rust
 .add_plugin(GizmosPlugin)
 ```
 
 For interactive gizmos add the following bundle when spawning your camera
-```rs
+```rust
 GizmoInteractionCamera::default()
 ```
 
@@ -62,27 +62,27 @@ opt-level = 3
 # Usage
 
 Draw a single gizmo
-```rs
+```rust
 draw_gizmo(gizmo);
 ```
 
 Draw multiple gizmos
-```rs
+```rust
 draw_gizmos(vec![gizmo, gizmo, gizmo]);
 ```
 
 Draw multiple gizmos and a connecting line
-```rs
+```rust
 draw_gizmos_with_line(vec![gizmo, gizmo, gizmo]);
 ```
 
 Draw a line
-```rs
+```rust
 draw_line(points, color);
 ```
 
 Draw a closed line
-```rs
+```rust
 draw_closed_line(points, color);
 ```
 
@@ -90,9 +90,11 @@ draw_closed_line(points, color);
 
 # Interactions
 
-```rs
+```rust
 Gizmo::new(translation, size, color).on_click(|| println!("Clicked!"))
 Gizmo::new(translation, size, color).on_hover(|| println!("Hovered!"))
+Gizmo::new(translation, size, color).on_click_system(|time: Res<Time>| ...)
+Gizmo::new(translation, size, color).on_hover_system(|query: Query<&Transform>| ...)
 ```
 
 

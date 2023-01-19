@@ -2,6 +2,14 @@
 
 > Dates are formatted as DD.MM.YYYY
 
+## Version 0.3.1 (19.01.2023)
+
+### Added
+
+- `on_hover_system()` Access any bevy system parameters in a hover interaction
+- `on_click_system()` Access any bevy system parameters in a click interaction
+
+
 ## Version 0.3.0 (18.01.2023)
 
 ### Added
