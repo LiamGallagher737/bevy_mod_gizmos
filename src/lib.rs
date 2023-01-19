@@ -1,6 +1,6 @@
 //! # Examples
 //!
-//! Draw a single gizmo
+//! Draw a single [`gizmo`](Gizmo)
 //! ```
 //! # use bevy::prelude::*;
 //! # use bevy_mod_gizmos::*;
@@ -39,7 +39,7 @@
 //! The rest of the methods can be found <a href="#functions">here</a>.
 
 use bevy::prelude::*;
-use interactions::interactions_handler;
+use interactions::{interactions_handler, interactions_handler_system};
 use spawning::{cleanup, spawn_gizmos};
 
 mod api;
@@ -61,5 +61,6 @@ impl Plugin for GizmosPlugin {
         app.add_system_to_stage(CoreStage::PreUpdate, cleanup);
         app.add_system_to_stage(CoreStage::PreUpdate, spawn_gizmos.after(cleanup));
         app.add_system_to_stage(CoreStage::PostUpdate, interactions_handler);
+        app.add_system_to_stage(CoreStage::PostUpdate, interactions_handler_system);
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    interactions::{OnClick, OnHover},
+    interactions::{OnClick, OnClickSystem, OnHover, OnHoverSystem},
     line::Line,
     Gizmo,
 };
@@ -55,6 +55,14 @@ pub(crate) fn spawn_gizmos(
 
             if let Some(func) = gizmo.interactions.on_click {
                 e.insert(OnClick(func));
+            }
+
+            if let Some(func) = gizmo.interactions.on_hover_system {
+                e.insert(OnHoverSystem(func));
+            }
+
+            if let Some(func) = gizmo.interactions.on_click_system {
+                e.insert(OnClickSystem(func));
             }
         }
     }
