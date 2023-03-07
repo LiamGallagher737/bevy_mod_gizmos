@@ -2,14 +2,14 @@
 #![allow(clippy::type_complexity)]
 
 use crate::Gizmo;
-use bevy::{ecs::schedule::SystemDescriptor, prelude::*};
+use bevy::{ecs::schedule::SystemConfig, prelude::*, window::PrimaryWindow};
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub(crate) struct GizmoInteractions {
     pub(crate) on_hover: Option<fn()>,
     pub(crate) on_click: Option<fn()>,
-    pub(crate) on_hover_system: Option<SystemDescriptor>,
-    pub(crate) on_click_system: Option<SystemDescriptor>,
+    pub(crate) on_hover_system: Option<SystemConfig>,
+    pub(crate) on_click_system: Option<SystemConfig>,
 }
 
 impl Gizmo {
@@ -27,15 +27,15 @@ impl Gizmo {
 
     /// Run the provided function when the gizmo is hovered, you can use any bevy system parameters
     /// here but keep in mind no other systems can run at the same time as this so try to keep it short
-    pub fn on_hover_system<Params>(mut self, func: impl IntoSystemDescriptor<Params>) -> Self {
-        self.interactions.on_hover_system = Some(func.into_descriptor());
+    pub fn on_hover_system<Params>(mut self, func: impl IntoSystemConfig<Params>) -> Self {
+        self.interactions.on_hover_system = Some(func.into_config());
         self
     }
 
     /// Run the provided function when the gizmo is clicked on, you can use any bevy system parameters
     /// here but keep in mind no other systems can run at the same time as this so try to keep it short
-    pub fn on_click_system<Params>(mut self, func: impl IntoSystemDescriptor<Params>) -> Self {
-        self.interactions.on_click_system = Some(func.into_descriptor());
+    pub fn on_click_system<Params>(mut self, func: impl IntoSystemConfig<Params>) -> Self {
+        self.interactions.on_click_system = Some(func.into_config());
         self
     }
 }
@@ -51,10 +51,10 @@ pub struct OnHover(pub(crate) fn());
 pub struct OnClick(pub(crate) fn());
 
 #[derive(Component)]
-pub struct OnHoverSystem(pub(crate) SystemDescriptor);
+pub struct OnHoverSystem(pub(crate) SystemConfig);
 
 #[derive(Component)]
-pub struct OnClickSystem(pub(crate) SystemDescriptor);
+pub struct OnClickSystem(pub(crate) SystemConfig);
 
 pub(crate) fn interactions_handler(
     query: Query<
@@ -63,15 +63,15 @@ pub(crate) fn interactions_handler(
     >,
     camera: Query<(&Camera, &GlobalTransform), With<GizmoInteractionCamera>>,
     mouse_btns: Res<Input<MouseButton>>,
-    windows: Res<Windows>,
+    window: Query<&Window, With<PrimaryWindow>>,
 ) {
     // Get the mouse position
-    let mouse_pos = if let Some(Some(pos)) = windows.get_primary().map(|w| w.cursor_position()) {
-        pos
-    } else {
-        // Most likely the cursor isn't within the window
-        return;
-    };
+    let mouse_pos =
+        if let Ok(Some(pos)) = window.get_single().map(|window| window.cursor_position()) {
+            pos
+        } else {
+            return;
+        };
 
     // Get the gizmo interaction camera
     let (camera, cam_transform) = if let Ok(cam) = camera.get_single() {
@@ -85,6 +85,7 @@ pub(crate) fn interactions_handler(
         if distance > transform.scale.x {
             continue;
         }
+
         // On Hover
         if let Some(on_hover) = on_hover {
             on_hover.0();
@@ -100,17 +101,19 @@ pub(crate) fn interactions_handler(
     }
 }
 
-pub(crate) fn interactions_handler_system(world: &mut World) {
+pub(crate) fn system_interactions_handler(world: &mut World) {
     let clicked = world
         .resource::<Input<MouseButton>>()
         .just_pressed(MouseButton::Left);
 
     // Get the mouse position
-    let windows = world.resource::<Windows>();
-    let mouse_pos = if let Some(Some(pos)) = windows.get_primary().map(|w| w.cursor_position()) {
+    let mut window = world.query_filtered::<&Window, With<PrimaryWindow>>();
+    let mouse_pos = if let Ok(Some(pos)) = window
+        .get_single(world)
+        .map(|window| window.cursor_position())
+    {
         pos
     } else {
-        // Most likely the cursor isn't within the window
         return;
     };
 
@@ -123,42 +126,46 @@ pub(crate) fn interactions_handler_system(world: &mut World) {
         return;
     };
 
-    let mut app = App::new();
-    std::mem::swap(&mut app.world, world);
+    let mut schedule = Schedule::default();
 
+    // Query all gizmo entities with eiter a hover or click interaction or both
     let mut query: QueryState<
         Entity,
         (
             Or<(With<OnHoverSystem>, With<OnClickSystem>)>,
             With<Transform>,
         ),
-    > = app.world.query_filtered();
+    > = world.query_filtered();
 
-    let entities: Vec<Entity> = query.iter(&app.world).collect();
+    // Get the query entities
+    let entities: Vec<Entity> = query.iter(world).collect();
 
     for e in entities {
-        let on_hover = app.world.entity_mut(e).remove::<OnHoverSystem>();
-        let on_click = app.world.entity_mut(e).remove::<OnClickSystem>();
-        let transform = app.world.entity(e).get::<Transform>().unwrap();
+        let on_hover = world.entity_mut(e).take::<OnHoverSystem>();
+        let on_click = world.entity_mut(e).take::<OnClickSystem>();
+        let transform = world.entity(e).get::<Transform>().unwrap();
 
+        // Check if hovered by cursor
         let distance = gizmo_distance(&camera, &cam_transform, mouse_pos, transform.translation);
         if distance > transform.scale.x {
             continue;
         }
 
+        // Hover interaction
         if let Some(on_hover) = on_hover {
-            app.add_system(on_hover.0);
+            schedule.add_system(on_hover.0);
         }
 
+        // Clicked interaction
         if clicked {
             if let Some(on_click) = on_click {
-                app.add_system(on_click.0);
+                schedule.add_system(on_click.0);
             }
         }
     }
 
-    app.update();
-    std::mem::swap(&mut app.world, world);
+    // Run the schedule on the world
+    schedule.run(world);
 }
 
 // Calculates the distance from the cursor to the gizmo

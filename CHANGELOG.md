@@ -2,6 +2,11 @@
 
 > Dates are formatted as DD.MM.YYYY
 
+## Version 0.4.0 (07.03.2023)
+
+- Bevy 0.10 support
+- No longer using `lazy_static`
+
 ## Version 0.3.1 (19.01.2023)
 
 ### Added

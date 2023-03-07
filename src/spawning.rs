@@ -5,16 +5,13 @@ use crate::{
 };
 use bevy::{
     pbr::{NotShadowCaster, NotShadowReceiver},
-    prelude::*,
+    prelude::{shape::Icosphere, *},
     render::{mesh::Indices, render_resource::PrimitiveTopology},
 };
-use lazy_static::lazy_static;
 use std::sync::RwLock;
 
-lazy_static! {
-    pub(crate) static ref GIZMO_SPAWN_BUFFER: RwLock<Vec<Gizmo>> = RwLock::new(vec![]);
-    pub(crate) static ref LINE_SPAWN_BUFFER: RwLock<Vec<Line>> = RwLock::new(vec![]);
-}
+pub(crate) static GIZMO_SPAWN_BUFFER: RwLock<Vec<Gizmo>> = RwLock::new(vec![]);
+pub(crate) static LINE_SPAWN_BUFFER: RwLock<Vec<Line>> = RwLock::new(vec![]);
 
 #[derive(Component)]
 pub struct GizmoMarker;
@@ -26,7 +23,7 @@ pub(crate) fn spawn_gizmos(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if mesh_handle.is_weak() {
-        let handle = meshes.add(Mesh::from(shape::Icosphere::default()));
+        let handle = meshes.add(Mesh::try_from(Icosphere::default()).unwrap());
         *mesh_handle = handle;
     }
 

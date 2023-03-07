@@ -103,6 +103,8 @@ Gizmo::new(translation, size, color).on_hover_system(|query: Query<&Transform>| 
 
 |Bevy|bevy_mod_gizmos|
 |---|---|
+|main|development|
+|0.10|0.4.0|
 |0.9|0.3.1|
 |0.7|0.1.1|
 

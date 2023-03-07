@@ -1,7 +1,8 @@
 use crate::interactions::GizmoInteractions;
 use bevy::prelude::*;
+use std::fmt::Debug;
 
-#[derive(Debug)]
+/// A gizmo
 pub struct Gizmo {
     pub(crate) translation: Vec3,
     pub(crate) size: f32,
@@ -9,7 +10,18 @@ pub struct Gizmo {
     pub(crate) interactions: GizmoInteractions,
 }
 
+impl Debug for Gizmo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Gizmo")
+            .field("translation", &self.translation)
+            .field("size", &self.size)
+            .field("color", &self.color)
+            .finish()
+    }
+}
+
 impl Gizmo {
+    /// Gizmo constructor
     pub fn new(translation: Vec3, size: f32, color: Color) -> Self {
         Self {
             translation,

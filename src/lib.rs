@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 //! # Examples
 //!
 //! Draw a single [`gizmo`](Gizmo)
@@ -39,7 +41,7 @@
 //! The rest of the methods can be found <a href="#functions">here</a>.
 
 use bevy::prelude::*;
-use interactions::{interactions_handler, interactions_handler_system};
+use interactions::{interactions_handler, system_interactions_handler};
 use spawning::{cleanup, spawn_gizmos};
 
 mod api;
@@ -57,10 +59,13 @@ pub use line::*;
 pub struct GizmosPlugin;
 impl Plugin for GizmosPlugin {
     fn build(&self, app: &mut App) {
-        // Using First instead of PreUpdate causes issues with bevy_editor_pls
-        app.add_system_to_stage(CoreStage::PreUpdate, cleanup);
-        app.add_system_to_stage(CoreStage::PreUpdate, spawn_gizmos.after(cleanup));
-        app.add_system_to_stage(CoreStage::PostUpdate, interactions_handler);
-        app.add_system_to_stage(CoreStage::PostUpdate, interactions_handler_system);
+        app.add_systems(
+            (cleanup, spawn_gizmos)
+                .chain()
+                .in_base_set(CoreSet::PreUpdate),
+        );
+        app.add_systems(
+            (interactions_handler, system_interactions_handler).in_base_set(CoreSet::PostUpdate),
+        );
     }
 }

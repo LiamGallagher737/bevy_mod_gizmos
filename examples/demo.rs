@@ -11,6 +11,8 @@ fn main() {
         .add_startup_system(setup)
         .add_system(update)
 
+        // This resource is used to showcase being able
+        // to run any system on hover and click
         .init_resource::<GizmosOffset>()
         
         .run();
@@ -32,7 +34,8 @@ fn setup(mut commands: Commands) {
     ));
 }
 
-// Notice this resource is read only
+// Notice this resource is read only,
+// it is being mutated by the hover and click systems
 fn update(offset: Res<GizmosOffset>) {
     draw_gizmo(
         Gizmo::new(Vec3::ZERO + offset.0, 1.0, Color::WHITE)
