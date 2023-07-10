@@ -9,4 +9,4 @@ edition = "2021"
 exclude = [".github/"]
 
 [dependencies]
-bevy = "0.10"
+bevy = "0.11"
